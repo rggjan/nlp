@@ -24,7 +24,7 @@ public class Main {
 			String line;
 			
 			while ((line = br.readLine()) != null) {
-			    contentOfFile.append(line);
+			    contentOfFile.append(" " + line);
 			}
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found!");
@@ -38,13 +38,12 @@ public class Main {
 		
 		// Normalize the text
 		text = text.toLowerCase();
-		text = text.replaceAll("[,.;!?*():\"'-]", "");
-		text = text.replaceAll("", "");
+		text = text.replaceAll("[,.;!?*():\"'-]+", " ");
 
 		HashSet<String> finalstems = new HashSet<String>();
 		HashSet<String> finalprefixes = new HashSet<String>();
 
-		List<String> wordlist = Arrays.asList(text.split("\\s+"));
+		List<String> wordlist = Arrays.asList(text.trim().split("\\s+"));
 
 		// Find all prefixes
 		for (int i = 4; i >= 1; i--) {
@@ -82,6 +81,7 @@ public class Main {
 					// Only take prefixes that occur in multiple words
 					for (String stem : set) {
 						finalstems.add(stem);
+						System.out.println(prefix + "/" + stem);
 					}
 				} else {
 					// We didn't have a prefix... put the word together again
@@ -93,18 +93,21 @@ public class Main {
 
 		System.out.println("Prefixes:");
 		for (String prefix : finalprefixes) {
-			System.out.println(prefix);
+			System.out.print(prefix + ", ");
 		}
+		System.out.println();
 
 		System.out.println("Stems:");
 		for (String stem : finalstems) {
-			System.out.println(stem);
+			System.out.print(stem + ", ");
 		}
+		System.out.println();
 
 		System.out.println("Others:");
-		for (String word : wordlist) {
-			System.out.println(word);
+		for (String word : new HashSet<String>(wordlist)) {
+			System.out.print(word + ", ");
 		}
+		System.out.println();
 
 		System.exit(0);
 
