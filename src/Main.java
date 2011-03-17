@@ -1,4 +1,9 @@
+import java.io.BufferedReader;
 import java.io.Console;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,16 +14,37 @@ import java.util.Map;
 public class Main {
 
 	public static void main(String[] args) {
-		String text = "house inhouse insist interesting prefix CAT incat preoccuppied, dog insist.";
+		BufferedReader br;
+		StringBuffer contentOfFile = new StringBuffer();
 
+		try {
+			br = new BufferedReader(new InputStreamReader(
+					new FileInputStream("Data/Train.txt")));
+		
+			String line;
+			
+			while ((line = br.readLine()) != null) {
+			    contentOfFile.append(line);
+			}
+		} catch (FileNotFoundException e) {
+			System.err.println("File not found!");
+			System.exit(1);
+		} catch (IOException e) {
+			System.err.println("IO Exception!");
+			System.exit(1);
+		}
+		
+		String text = contentOfFile.toString();
+		
 		// Normalize the text
 		text = text.toLowerCase();
-		text = text.replaceAll("[,.;!?]", "");
+		text = text.replaceAll("[,.;!?*():\"'-]", "");
+		text = text.replaceAll("", "");
 
 		HashSet<String> finalstems = new HashSet<String>();
 		HashSet<String> finalprefixes = new HashSet<String>();
 
-		List<String> wordlist = Arrays.asList(text.split(" "));
+		List<String> wordlist = Arrays.asList(text.split("\\s+"));
 
 		// Find all prefixes
 		for (int i = 4; i >= 1; i--) {
