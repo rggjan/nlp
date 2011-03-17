@@ -17,17 +17,21 @@ public class Main {
 
 		HashSet<String> finalstems = new HashSet<String>();
 		HashSet<String> finalprefixes = new HashSet<String>();
-		
+
 		List<String> wordlist = Arrays.asList(text.split(" "));
-		
+
 		// Find all prefixes
 		for (int i = 4; i >= 1; i--) {
+			List<String> newlist = new ArrayList<String>();
+
 			HashMap<String, HashSet<String>> prefixes = new HashMap<String, HashSet<String>>();
 
 			// Iterate over all words
 			for (String word : wordlist) {
-				if (word.length() <= i)
+				if (word.length() <= i) {
+					newlist.add(word);
 					continue;
+				}
 
 				String prefix = word.substring(0, i);
 				String stem = word.substring(i, word.length());
@@ -38,38 +42,42 @@ public class Main {
 					set = new HashSet<String>();
 					prefixes.put(prefix, set);
 				}
-				
+
 				set.add(stem);
 			}
-			
-			wordlist = new ArrayList<String>();
-			
+
 			// Get all real prefixes
 			for (Map.Entry<String, HashSet<String>> entry : prefixes.entrySet()) {
-			  String prefix = entry.getKey();
-			  HashSet<String> set = entry.getValue();
-			  
-			  if (set.size() > 1) {
-				  finalprefixes.add(prefix);
-				  // Only take prefixes that occur in multiple words
-				  for (String stem : set) {
-					  finalstems.add(stem);
-				  }
-			  } else {
-				  // We didn't have a prefix... put the word together again
-				  wordlist.add(prefix + set.iterator().next());
-			  }
+				String prefix = entry.getKey();
+				HashSet<String> set = entry.getValue();
+
+				if (set.size() > 1) {
+					finalprefixes.add(prefix);
+					// Only take prefixes that occur in multiple words
+					for (String stem : set) {
+						finalstems.add(stem);
+					}
+				} else {
+					// We didn't have a prefix... put the word together again
+					newlist.add(prefix + set.iterator().next());
+				}
 			}
+			wordlist = newlist;
 		}
-		
+
 		System.out.println("Prefixes:");
 		for (String prefix : finalprefixes) {
 			System.out.println(prefix);
 		}
-		
+
 		System.out.println("Stems:");
 		for (String stem : finalstems) {
 			System.out.println(stem);
+		}
+
+		System.out.println("Others:");
+		for (String word : wordlist) {
+			System.out.println(word);
 		}
 
 		System.exit(0);
