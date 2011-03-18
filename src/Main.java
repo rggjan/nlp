@@ -47,8 +47,10 @@ public class Main {
 
 		// Find all prefixes
 		for (int i = 4; i >= 1; i--) {
+			// i is the length of the prefix to be tried
 			List<String> newlist = new ArrayList<String>();
 
+			// maps prefixes to the stems that follow
 			HashMap<String, HashSet<String>> prefixes = new HashMap<String, HashSet<String>>();
 
 			// Iterate over all words
@@ -88,6 +90,10 @@ public class Main {
 					newlist.add(prefix + set.iterator().next());
 				}
 			}
+			
+			// replace the word list
+			// the newlist only contains words which were not yet used to
+			// build a prefix
 			wordlist = newlist;
 		}
 
