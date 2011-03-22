@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import dom.*;
 
 public class Main {
 
@@ -115,7 +116,13 @@ public class Main {
 		}
 		System.out.println();
 
-		System.exit(0);
+		Word w=new Word();
+		Splitting s=new Splitting();
+		w.addSplitting(s);
+		//w.addSplitting(s);
+		//w.fail();
+		
+		/*
 
 		// create alphabets
 		Alphabet lexicalAlphabet = new Alphabet();
@@ -133,5 +140,6 @@ public class Main {
 			lowerAlphabet.addSymbol(s);
 		}
 
+		*/
 	}
 }
