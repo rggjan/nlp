@@ -6,23 +6,23 @@ import java.util.List;
 
 
 
-public class State<TConfiguration extends Configuration> {
-	private final List<Link<TConfiguration>> links=new LinkedList<Link<TConfiguration>>();
+public class State<TCollector extends IResultCollector> {
+	private final List<Link<TCollector>> links=new LinkedList<Link<TCollector>>();
 	
 	private boolean accepting;
 	
-	public List<Link<TConfiguration>> getLinks(){
+	public List<Link<TCollector>> getLinks(){
 		return Collections.unmodifiableList(links);
 	}
-	public void leave(Link<TConfiguration> link, TConfiguration configuration){}
-	public void enter(Link<TConfiguration> link, State<TConfiguration> source, TConfiguration configuration){}
+	public void leave(Link<TCollector> link, Configuration<TCollector> configuration){}
+	public void enter(Link<TCollector> link, State<TCollector> source, Configuration<TCollector> configuration){}
 	public void setAccepting(boolean accepting) {
 		this.accepting = accepting;
 	}
 	public boolean isAccepting() {
 		return accepting;
 	}
-	public void addLink(Link<TConfiguration> link) {
+	public void addLink(Link<TCollector> link) {
 		links.add(link);
 	}
 }

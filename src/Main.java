@@ -131,32 +131,36 @@ public class Main {
 			lowerAlphabet.addSymbol(ch);
 		}
 
+		// create and fill the lower tape
 		Tape lowerTape=new Tape(lowerAlphabet);
 		for (char ch: "HelloWorld".toCharArray()){
 			lowerTape.write(ch);
 		}
 		lowerTape.setPosition(0);
 		
+		// create the lexical tape
 		Tape lexicalTape=new Tape(lexicalAlphabet);
 		
-		Transducer<DefaultConfiguration> transducer=new Transducer<DefaultConfiguration>();
-		transducer.setLowerAlphabet(lowerAlphabet);
-		transducer.setUpperAlphabet(lexicalAlphabet);
+		// create the start and end state
+		State<ResultCollector> startState=new State<ResultCollector>();
 		
-		State<DefaultConfiguration> startState=new State<DefaultConfiguration>();
-		
-		State<DefaultConfiguration> endState=new State<DefaultConfiguration>();
+		State<ResultCollector> endState=new State<ResultCollector>();
 		endState.setAccepting(true);
 		
-		StringLink link=new StringLink("HelloWorld", "Yeah", endState);
-		transducer.setStartState(startState);
-		startState.addLink(link);
+		// add first link
+		startState.addLink(new StringLink("HelloWorld", "Yeah", endState));
 		
+		// add second link
+		startState.addLink(new StringLink("HelloWorld", "YeahBoah", endState));
+		
+		// create the result collector
 		ResultCollector collector=new ResultCollector();
-		DefaultConfiguration config=new DefaultConfiguration(transducer,lowerTape,lexicalTape,collector);
+		
+		// run the configuration
+		Configuration<ResultCollector> config=new Configuration<ResultCollector>(startState,lowerTape,lexicalTape,collector);
 		config.run();
 
-		for (DefaultConfiguration conf: collector.getAcceptingConfigurations()){
+		for (Configuration<ResultCollector> conf: collector.getAcceptingConfigurations()){
 			System.out.println("Result: "+conf.getUpperTape());
 		}
 	}

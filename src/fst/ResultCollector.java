@@ -2,15 +2,20 @@ package fst;
 
 import java.util.*;
 
-public class ResultCollector {
-	private final LinkedList<DefaultConfiguration> acceptingConfigurations=new LinkedList<DefaultConfiguration>();
+public class ResultCollector implements IResultCollector<ResultCollector>{
+	private final LinkedList<Configuration<ResultCollector>> acceptingConfigurations=new LinkedList<Configuration<ResultCollector>>();
 	
-	public void addAcceptingConfiguration(DefaultConfiguration configuration){
+	public void addAcceptingConfiguration(Configuration<ResultCollector> configuration){
 		acceptingConfigurations.add(configuration);
 	}
 
-	public List<DefaultConfiguration> getAcceptingConfigurations() {
+	public List<Configuration<ResultCollector>> getAcceptingConfigurations() {
 		return Collections.unmodifiableList(acceptingConfigurations);
+	}
+
+	@Override
+	public void success(Configuration<ResultCollector> configuration) {
+		acceptingConfigurations.add(configuration);
 	}
 	
 	

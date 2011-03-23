@@ -1,15 +1,15 @@
 package fst;
 
-public class Link<TConfiguration extends Configuration> {
-	private State<TConfiguration> target;
+public class Link<TCollector extends IResultCollector> {
+	private State<TCollector> target;
 	
-	public boolean cross(State<TConfiguration> source, TConfiguration configuration){return true;}
+	public boolean cross(State<TCollector> source, Configuration<TCollector> configuration){return true;}
 
-	void setTarget(State<TConfiguration> target) {
+	void setTarget(State<TCollector> target) {
 		this.target = target;
 	}
 
-	public State<TConfiguration> getTarget() {
+	public State<TCollector> getTarget() {
 		return target;
 	}
 }

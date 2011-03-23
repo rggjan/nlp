@@ -5,21 +5,21 @@ package fst;
  * @author ruedi
  *
  */
-public abstract class Configuration<TConfiguration extends Configuration<TConfiguration>> {
+public class Configuration<TCollector extends IResultCollector> {
 	private Tape lowerTape;
 	private Tape upperTape;
-	private State<TConfiguration> currentState;
-	private Transducer<TConfiguration> transducer;
+	private State<TCollector> currentState;
+	TCollector collector;
 	
-	public Configuration(Transducer<TConfiguration> transducer, Tape lowerTape, Tape upperTape) {
-		this.transducer=transducer;
-		currentState=transducer.getStartState();
+	public Configuration(State<TCollector> startState, Tape lowerTape, Tape upperTape, TCollector collector) {
+		this.collector=collector;
+		currentState=startState;
 		this.lowerTape=lowerTape;
 		this.upperTape=upperTape;
 	}
 	
-	public Configuration(Configuration<TConfiguration> other) {
-		this.transducer=other.transducer;
+	public Configuration(Configuration<TCollector> other) {
+		collector=other.collector;
 		currentState=other.currentState;
 		lowerTape=new Tape(other.lowerTape);
 		upperTape=new Tape(other.upperTape);
@@ -27,13 +27,14 @@ public abstract class Configuration<TConfiguration extends Configuration<TConfig
 
 	public void run(){
 		if (currentState.isAccepting()){
-			success();
+			collector.success(this);
 		}
 		// run this configuration
-		for (Link<TConfiguration> link:currentState.getLinks()){
-			State<TConfiguration> target = link.getTarget();
+		for (Link<TCollector> link:currentState.getLinks()){
+			State<TCollector> target = link.getTarget();
+			
 			// create the new state
-			TConfiguration configuration=copy();
+			Configuration<TCollector> configuration=new Configuration<TCollector>(this);
 			
 			// leave the current state, cross the link and enter the target state
 			currentState.leave(link, configuration);
@@ -46,15 +47,11 @@ public abstract class Configuration<TConfiguration extends Configuration<TConfig
 		}
 	}
 	
-	protected void success() {}
-
-	protected abstract TConfiguration copy();
-
-	public void setCurrentState(State<TConfiguration> currentState) {
+	public void setCurrentState(State<TCollector> currentState) {
 		this.currentState = currentState;
 	}
 
-	public State<TConfiguration> getCurrentState() {
+	public State<TCollector> getCurrentState() {
 		return currentState;
 	}
 
