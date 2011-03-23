@@ -153,6 +153,9 @@ public class Main {
 		// add second link
 		startState.addLink(new StringLink("HelloWorld", "YeahBoah", endState));
 		
+		// add infinite link
+		endState.addLink(new StringLink("", "i", endState));
+		
 		// create the result collector
 		ResultCollector collector=new ResultCollector();
 		

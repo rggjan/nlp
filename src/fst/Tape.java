@@ -2,9 +2,8 @@ package fst;
 
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-
+import static fst.Utils.*;
 
 public class Tape {
 	private final Alphabet alphabet;
@@ -72,5 +71,25 @@ public class Tape {
 
 	public void setPosition(int i) {
 		position=i;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Tape)) return false;
+		Tape other=(Tape) obj;
+		
+		if (position!=other.position) return false;
+		if (alphabet!=other.alphabet) return false;
+		if (!contents.equals(other.contents)) return false;
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash=1;
+		hash=hash*31+position;
+		hash=hash*31+contents.hashCode();
+		hash=hash*31+alphabet.hashCode();
+		return hash;
 	}
 }
