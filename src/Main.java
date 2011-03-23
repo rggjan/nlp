@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import dom.*;
+import fst.*;
 
 public class Main {
 
@@ -116,30 +117,44 @@ public class Main {
 		}
 		System.out.println();
 
-		Word w=new Word();
-		Splitting s=new Splitting();
-		w.addSplitting(s);
-		//w.addSplitting(s);
-		//w.fail();
-		
-		/*
-
 		// create alphabets
 		Alphabet lexicalAlphabet = new Alphabet();
 		Alphabet lowerAlphabet = new Alphabet();
 
 		for (char ch = 'a'; ch <= 'z'; ch++) {
-			Symbol s = new Symbol(ch);
-			lexicalAlphabet.addSymbol(s);
-			lowerAlphabet.addSymbol(s);
+			lexicalAlphabet.addSymbol(ch);
+			lowerAlphabet.addSymbol(ch);
 		}
 
 		for (char ch = 'A'; ch <= 'Z'; ch++) {
-			Symbol s = new Symbol(ch);
-			lexicalAlphabet.addSymbol(s);
-			lowerAlphabet.addSymbol(s);
+			lexicalAlphabet.addSymbol(ch);
+			lowerAlphabet.addSymbol(ch);
 		}
 
-		*/
+		Tape lowerTape=new Tape(lowerAlphabet);
+		Head head=new Head(lowerTape);
+		for (char ch: "HelloWorld".toCharArray()){
+			head.write(ch);
+		}
+		
+		Tape lexicalTape=new Tape(lexicalAlphabet);
+		
+		Transducer<DefaultConfiguration> transducer=new Transducer<DefaultConfiguration>();
+		transducer.setLowerAlphabet(lowerAlphabet);
+		transducer.setLowerTape(lowerTape);
+		transducer.setUpperAlphabet(lexicalAlphabet);
+		transducer.setUpperTape(lexicalTape);
+		
+		State<DefaultConfiguration> startState=new State<DefaultConfiguration>();
+		
+		State<DefaultConfiguration> endState=new State<DefaultConfiguration>();
+		
+		StringLink link=new StringLink("Hello World", "Yeah", endState);
+		transducer.setStartState(startState);
+		
+		DefaultConfiguration config=new DefaultConfiguration(transducer);
+		config.run();
+		
+		System.out.println("Result: "+lexicalTape);
 	}
 }
