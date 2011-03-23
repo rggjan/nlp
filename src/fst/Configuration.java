@@ -6,26 +6,29 @@ package fst;
  *
  */
 public abstract class Configuration<TConfiguration extends Configuration<TConfiguration>> {
-	private Head lowerHead;
-	private Head upperHead;
+	private Tape lowerTape;
+	private Tape upperTape;
 	private State<TConfiguration> currentState;
 	private Transducer<TConfiguration> transducer;
 	
-	public Configuration(Transducer<TConfiguration> transducer) {
+	public Configuration(Transducer<TConfiguration> transducer, Tape lowerTape, Tape upperTape) {
 		this.transducer=transducer;
 		currentState=transducer.getStartState();
-		lowerHead=new Head(transducer.getLowerTape());
-		upperHead=new Head(transducer.getUpperTape());
+		this.lowerTape=lowerTape;
+		this.upperTape=upperTape;
 	}
 	
 	public Configuration(Configuration<TConfiguration> other) {
 		this.transducer=other.transducer;
 		currentState=other.currentState;
-		lowerHead=new Head(other.lowerHead);
-		upperHead=new Head(other.upperHead);
+		lowerTape=new Tape(other.lowerTape);
+		upperTape=new Tape(other.upperTape);
 	}
 
 	public void run(){
+		if (currentState.isAccepting()){
+			success();
+		}
 		// run this configuration
 		for (Link<TConfiguration> link:currentState.getLinks()){
 			State<TConfiguration> target = link.getTarget();
@@ -37,10 +40,15 @@ public abstract class Configuration<TConfiguration extends Configuration<TConfig
 			link.cross(currentState, configuration);
 			configuration.setCurrentState(target);
 			target.enter(link, currentState, configuration);
+			
+			// do the recursive call
+			configuration.run();
 		}
 	}
 	
-	public abstract TConfiguration copy();
+	protected void success() {}
+
+	protected abstract TConfiguration copy();
 
 	public void setCurrentState(State<TConfiguration> currentState) {
 		this.currentState = currentState;
@@ -51,11 +59,11 @@ public abstract class Configuration<TConfiguration extends Configuration<TConfig
 	}
 
 
-	public Head getLowerHead() {
-		return lowerHead;
+	public Tape getLowerTape() {
+		return lowerTape;
 	}
 
-	public Head getUpperHead() {
-		return upperHead;
+	public Tape getUpperTape() {
+		return upperTape;
 	}
 }

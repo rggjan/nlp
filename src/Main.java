@@ -132,29 +132,32 @@ public class Main {
 		}
 
 		Tape lowerTape=new Tape(lowerAlphabet);
-		Head head=new Head(lowerTape);
 		for (char ch: "HelloWorld".toCharArray()){
-			head.write(ch);
+			lowerTape.write(ch);
 		}
+		lowerTape.setPosition(0);
 		
 		Tape lexicalTape=new Tape(lexicalAlphabet);
 		
 		Transducer<DefaultConfiguration> transducer=new Transducer<DefaultConfiguration>();
 		transducer.setLowerAlphabet(lowerAlphabet);
-		transducer.setLowerTape(lowerTape);
 		transducer.setUpperAlphabet(lexicalAlphabet);
-		transducer.setUpperTape(lexicalTape);
 		
 		State<DefaultConfiguration> startState=new State<DefaultConfiguration>();
 		
 		State<DefaultConfiguration> endState=new State<DefaultConfiguration>();
+		endState.setAccepting(true);
 		
-		StringLink link=new StringLink("Hello World", "Yeah", endState);
+		StringLink link=new StringLink("HelloWorld", "Yeah", endState);
 		transducer.setStartState(startState);
+		startState.addLink(link);
 		
-		DefaultConfiguration config=new DefaultConfiguration(transducer);
+		ResultCollector collector=new ResultCollector();
+		DefaultConfiguration config=new DefaultConfiguration(transducer,lowerTape,lexicalTape,collector);
 		config.run();
-		
-		System.out.println("Result: "+lexicalTape);
+
+		for (DefaultConfiguration conf: collector.getAcceptingConfigurations()){
+			System.out.println("Result: "+conf.getUpperTape());
+		}
 	}
 }

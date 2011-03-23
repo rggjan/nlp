@@ -22,4 +22,7 @@ public class State<TConfiguration extends Configuration> {
 	public boolean isAccepting() {
 		return accepting;
 	}
+	public void addLink(Link<TConfiguration> link) {
+		links.add(link);
+	}
 }

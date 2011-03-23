@@ -13,12 +13,13 @@ public class StringLink extends Link<DefaultConfiguration>{
 	@Override
 	public boolean cross(State<DefaultConfiguration> source, DefaultConfiguration configuration) {
 		super.cross(source, configuration);
-		Head lowerHead=configuration.getLowerHead();
+		Tape lowerHead=configuration.getLowerTape();
 		for (char ch: lowerString.toCharArray()){
+			if (!lowerHead.canRead()) return false;
 			if (ch!=lowerHead.read()) return false;
 		}
 		for (char ch: upperString.toCharArray()){
-			configuration.getUpperHead().write(ch);
+			configuration.getUpperTape().write(ch);
 		}
 		return true;
 	}
