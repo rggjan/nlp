@@ -18,6 +18,7 @@ public class Text {
 	private String rawText;
 
 	public HashSet<String> prefixes = new HashSet<String>();
+	public HashSet<String> suffixes = new HashSet<String>();
 
 	public void readText() throws IOException {
 		BufferedReader br;
@@ -49,9 +50,28 @@ public class Text {
 		}
 	}
 
+	public HashSet<String> searchForSuffixes() {
+		suffixes.clear();
+
+		HashSet<String> reversed = searchForAffixes(new StringBuffer(rawText)
+				.reverse().toString());
+
+		for (String s : reversed) {
+			suffixes.add(new StringBuffer(s).reverse().toString());
+		}
+		return suffixes;
+	}
+
 	public HashSet<String> searchForPrefixes() {
+		prefixes = searchForAffixes(rawText);
+		return prefixes;
+	}
+
+	public HashSet<String> searchForAffixes(String text) {
+		HashSet<String> affixes = new HashSet<String>();
+
 		// Normalize the text
-		String text = rawText.toLowerCase();
+		text = text.toLowerCase();
 		text = text.replaceAll("[,.;!?*():\"'-]+", " ");
 
 		List<String> wordlist = Arrays.asList(text.trim().split("\\s+"));
@@ -91,11 +111,12 @@ public class Text {
 				HashSet<String> set = entry.getValue();
 
 				if (set.size() > 1) {
-					prefixes.add(prefix);
+					affixes.add(prefix);
 					// Only take prefixes that occur in multiple words
-					for (String stem : set) {
-						System.out.println(prefix + "/" + stem);
-					}
+					/*
+					 * for (String stem : set) { System.out.println(prefix + "/"
+					 * + stem); }
+					 */
 				} else {
 					// We didn't have a prefix... put the word together again
 					newlist.add(prefix + set.iterator().next());
@@ -108,6 +129,6 @@ public class Text {
 			wordlist = newlist;
 		}
 
-		return prefixes;
+		return affixes;
 	}
 }

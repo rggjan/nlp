@@ -26,10 +26,16 @@ public class Main {
 		}
 
 		HashSet<String> prefixes = text.searchForPrefixes();
-
 		System.out.println("Prefixes:");
 		for (String prefix : prefixes) {
 			System.out.print(prefix + ", ");
+		}
+		System.out.println();
+
+		HashSet<String> suffixes = text.searchForSuffixes();
+		System.out.println("Suffixes:");
+		for (String suffix : suffixes) {
+			System.out.print(suffix + ", ");
 		}
 		System.out.println();
 
