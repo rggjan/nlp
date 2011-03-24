@@ -5,6 +5,12 @@ public class Splitting {
 	private Word word;
 	private WordPart prefix, stem, suffix;
 
+	public Splitting(WordPart prefix, WordPart stem, WordPart suffix) {
+		setPrefix(prefix);
+		setStem(stem);
+		setSuffix(suffix);
+	}
+
 	void setWordImp(Word word) {
 		this.word = word;
 	}
@@ -71,6 +77,12 @@ public class Splitting {
 
 	public WordPart getPrefix() {
 		return prefix;
+	}
+
+	public void increaseFrequency(float f) {
+		prefix.frequency += f;
+		stem.frequency += f;
+		suffix.frequency += f;
 	}
 
 }

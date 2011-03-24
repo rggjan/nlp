@@ -1,6 +1,5 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 
 import dom.Text;
 import fst.Alphabet;
@@ -26,21 +25,8 @@ public class Main {
 		}
 
 		text.generateWords();
-
-		HashSet<String> prefixes = text.searchForPrefixes();
-		System.out.println("Prefixes:");
-		for (String prefix : prefixes) {
-			System.out.print(prefix + ", ");
-		}
-		System.out.println();
-
-		HashSet<String> suffixes = text.searchForSuffixes();
-		System.out.println("Suffixes:");
-		for (String suffix : suffixes) {
-			System.out.print(suffix + ", ");
-		}
-		System.out.println();
-
+		text.searchForPrefixes();
+		text.searchForSuffixes();
 		text.generateStatistics();
 
 		// create alphabets

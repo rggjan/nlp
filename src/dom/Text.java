@@ -18,8 +18,9 @@ public class Text {
 	private final String filename;
 	private String rawText;
 
-	public HashSet<String> prefixes = new HashSet<String>();
-	public HashSet<String> suffixes = new HashSet<String>();
+	public HashMap<String, WordPart> prefixes = new HashMap<String, WordPart>();
+	public HashMap<String, WordPart> suffixes = new HashMap<String, WordPart>();
+	public HashMap<String, WordPart> stems = new HashMap<String, WordPart>();
 
 	public void readText() throws IOException {
 		BufferedReader br;
@@ -59,31 +60,25 @@ public class Text {
 		words = map.values();
 	}
 
-	public HashSet<String> searchForSuffixes() {
-		suffixes.clear();
+	public void searchForSuffixes() {
+		suffixes = searchForAffixes(new StringBuffer(rawText).reverse()
+				.toString());
 
-		HashSet<String> reversed = searchForAffixes(new StringBuffer(rawText)
-				.reverse().toString());
-
-		for (String s : reversed) {
-			suffixes.add(new StringBuffer(s).reverse().toString());
+		for (WordPart s : suffixes.values()) {
+			s.name = new StringBuffer(s.name).reverse().toString();
 		}
 
-		suffixes.add("");
-
-		return suffixes;
+		suffixes.put("", new WordPart(""));
 	}
 
-	public HashSet<String> searchForPrefixes() {
+	public void searchForPrefixes() {
 		prefixes = searchForAffixes(rawText);
 
-		prefixes.add("");
-
-		return prefixes;
+		prefixes.put("", new WordPart(""));
 	}
 
-	public HashSet<String> searchForAffixes(String text) {
-		HashSet<String> affixes = new HashSet<String>();
+	private HashMap<String, WordPart> searchForAffixes(String text) {
+		HashMap<String, WordPart> affixes = new HashMap<String, WordPart>();
 
 		// Normalize the text
 		text = text.toLowerCase();
@@ -126,7 +121,7 @@ public class Text {
 				HashSet<String> set = entry.getValue();
 
 				if (set.size() > 1) {
-					affixes.add(prefix);
+					affixes.put(prefix, new WordPart(prefix));
 					// Only take prefixes that occur in multiple words
 					/*
 					 * for (String stem : set) { System.out.println(prefix + "/"
@@ -149,7 +144,11 @@ public class Text {
 
 	public void generateStatistics() {
 		for (Word w : words) {
-			w.generateSplittings(prefixes, suffixes);
+			w.generateSplittings(prefixes, suffixes, stems);
+		}
+
+		for (WordPart p : stems.values()) {
+			// System.out.println(p.name + ": " + p.frequency);
 		}
 	}
 }
