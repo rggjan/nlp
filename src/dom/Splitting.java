@@ -3,20 +3,19 @@ package dom;
 public class Splitting {
 
 	private Word word;
-	private WordPart prefix,stem,suffix;
-	
-	
+	private WordPart prefix, stem, suffix;
+
 	void setWordImp(Word word) {
-		this.word=word;
+		this.word = word;
 	}
 
 	public void setWord(Word word) {
-		if (this.word!=null){
-			if (word!=null) throw new Error();
+		if (this.word != null) {
+			if (word != null)
+				throw new Error();
 			this.word.removeSplittingImp(this);
-			this.word=null;
-		}
-		else{
+			this.word = null;
+		} else {
 			this.word = word;
 			word.addSplittingImp(this);
 		}
@@ -27,12 +26,12 @@ public class Splitting {
 	}
 
 	public void setSuffix(WordPart suffix) {
-		if (this.suffix!=null){
-			if (suffix!=null) throw new Error();
+		if (this.suffix != null) {
+			if (suffix != null)
+				throw new Error();
 			this.suffix.removeSplittingImp(this);
-			this.suffix=null;
-		}
-		else{
+			this.suffix = null;
+		} else {
 			this.suffix = suffix;
 			suffix.addSplittingImp(this);
 		}
@@ -43,12 +42,12 @@ public class Splitting {
 	}
 
 	public void setStem(WordPart stem) {
-		if (this.stem!=null){
-			if (stem!=null) throw new Error();
+		if (this.stem != null) {
+			if (stem != null)
+				throw new Error();
 			this.stem.removeSplittingImp(this);
-			this.stem=null;
-		}
-		else{
+			this.stem = null;
+		} else {
 			this.stem = stem;
 			stem.addSplittingImp(this);
 		}
@@ -59,12 +58,12 @@ public class Splitting {
 	}
 
 	public void setPrefix(WordPart prefix) {
-		if (this.prefix!=null){
-			if (prefix!=null) throw new Error();
+		if (this.prefix != null) {
+			if (prefix != null)
+				throw new Error();
 			this.prefix.removeSplittingImp(this);
-			this.prefix=null;
-		}
-		else{
+			this.prefix = null;
+		} else {
 			this.prefix = prefix;
 			prefix.addSplittingImp(this);
 		}

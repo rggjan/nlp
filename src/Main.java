@@ -25,6 +25,8 @@ public class Main {
 			System.exit(1);
 		}
 
+		text.generateWords();
+
 		HashSet<String> prefixes = text.searchForPrefixes();
 		System.out.println("Prefixes:");
 		for (String prefix : prefixes) {
@@ -38,6 +40,8 @@ public class Main {
 			System.out.print(suffix + ", ");
 		}
 		System.out.println();
+
+		text.generateStatistics();
 
 		// create alphabets
 		Alphabet lexicalAlphabet = new Alphabet();

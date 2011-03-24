@@ -6,13 +6,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class Text {
-	private final List<Word> words = new ArrayList<Word>();
+	private Collection<Word> words = new ArrayList<Word>();
 
 	private final String filename;
 	private String rawText;
@@ -45,9 +46,17 @@ public class Text {
 		String text = rawText.toLowerCase();
 		text = text.replaceAll("[,.;!?*():\"'-]+", " ");
 
+		HashMap<String, Word> map = new HashMap<String, Word>();
+
 		for (String s : text.trim().split("\\s+")) {
-			words.add(new Word(s));
+			Word w = map.get(s);
+			if (w == null)
+				map.put(s, new Word(s));
+			else
+				w.count++;
 		}
+
+		words = map.values();
 	}
 
 	public HashSet<String> searchForSuffixes() {
@@ -59,11 +68,17 @@ public class Text {
 		for (String s : reversed) {
 			suffixes.add(new StringBuffer(s).reverse().toString());
 		}
+
+		suffixes.add("");
+
 		return suffixes;
 	}
 
 	public HashSet<String> searchForPrefixes() {
 		prefixes = searchForAffixes(rawText);
+
+		prefixes.add("");
+
 		return prefixes;
 	}
 
@@ -130,5 +145,11 @@ public class Text {
 		}
 
 		return affixes;
+	}
+
+	public void generateStatistics() {
+		for (Word w : words) {
+			w.generateSplittings(prefixes, suffixes);
+		}
 	}
 }
