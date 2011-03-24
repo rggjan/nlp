@@ -38,14 +38,11 @@ public class Main {
 			lowerAlphabet.addSymbol(ch);
 		}
 
-		for (char ch = 'A'; ch <= 'Z'; ch++) {
-			lexicalAlphabet.addSymbol(ch);
-			lowerAlphabet.addSymbol(ch);
-		}
+		lexicalAlphabet.addSymbol('^');
 
 		// create and fill the lower tape
 		Tape lowerTape = new Tape(lowerAlphabet);
-		for (char ch : "HelloWorld".toCharArray()) {
+		for (char ch : "abcd".toCharArray()) {
 			lowerTape.write(ch);
 		}
 		lowerTape.setPosition(0);
@@ -56,17 +53,22 @@ public class Main {
 		// create the start and end state
 		State<ResultCollector> startState = new State<ResultCollector>();
 
+		State<ResultCollector> middleState = new State<ResultCollector>();
+
 		State<ResultCollector> endState = new State<ResultCollector>();
 		endState.setAccepting(true);
 
 		// add first link
-		startState.addLink(new StringLink("HelloWorld", "Yeah", endState));
+		startState.addLink(new StringLink("a", "a^", middleState));
+		startState.addLink(new StringLink("ab", "ab^", middleState));
 
 		// add second link
-		startState.addLink(new StringLink("HelloWorld", "YeahBoah", endState));
+		middleState.addLink(new StringLink("bcd", "bcd", endState));
+
+		// TODO Why does this give a result ab^ ... ?
 
 		// add infinite link
-		endState.addLink(new StringLink("", "i", endState));
+		// endState.addLink(new StringLink("", "i", endState));
 
 		// create the result collector
 		ResultCollector collector = new ResultCollector();
