@@ -6,29 +6,23 @@ import java.util.List;
 import static fst.Utils.*;
 
 public class Tape {
-	private final Alphabet alphabet;
 	private final List<Character> contents=new ArrayList<Character>();
 	private int position;
 	
-	public Tape(Alphabet alphabet){
-		this.alphabet=alphabet;
-	}
-	
 	public Tape(Tape other){
 		this.position=other.position;
-		this.alphabet=other.alphabet;
 		contents.addAll(other.contents);
 	}
 	
+	public Tape() {
+	}
+
 	public Character get(int position) {
 		Character symbol = contents.get(position);
-		if (!getAlphabet().contains(symbol)) throw new Error();
 		return symbol;
 	}
 	
 	public void set(int position, Character s){
-		if (!getAlphabet().contains(s)) throw new Error();
-
 		if (position==contents.size()){
 			contents.add(s);
 		}
@@ -38,10 +32,7 @@ public class Tape {
 	}
 
 
-	public Alphabet getAlphabet() {
-		return alphabet;
-	}
-	
+
 	@Override
 	public String toString() {
 		String result="";
@@ -56,8 +47,6 @@ public class Tape {
 	}
 	
 	public void write(Character s){
-		if (!getAlphabet().contains(s)) 
-			throw new Error();
 		set(position++, s);
 	}
 	
@@ -79,7 +68,6 @@ public class Tape {
 		Tape other=(Tape) obj;
 		
 		if (position!=other.position) return false;
-		if (alphabet!=other.alphabet) return false;
 		if (!contents.equals(other.contents)) return false;
 		return true;
 	}
@@ -89,7 +77,6 @@ public class Tape {
 		int hash=1;
 		hash=hash*31+position;
 		hash=hash*31+contents.hashCode();
-		hash=hash*31+alphabet.hashCode();
 		return hash;
 	}
 }

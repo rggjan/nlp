@@ -2,7 +2,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import dom.Text;
-import fst.Alphabet;
 import fst.Configuration;
 import fst.ResultCollector;
 import fst.State;
@@ -29,26 +28,15 @@ public class Main {
 		text.searchForSuffixes();
 		text.generateStatistics();
 
-		// create alphabets
-		Alphabet lexicalAlphabet = new Alphabet();
-		Alphabet lowerAlphabet = new Alphabet();
-
-		for (char ch = 'a'; ch <= 'z'; ch++) {
-			lexicalAlphabet.addSymbol(ch);
-			lowerAlphabet.addSymbol(ch);
-		}
-
-		lexicalAlphabet.addSymbol('^');
-
 		// create and fill the lower tape
-		Tape lowerTape = new Tape(lowerAlphabet);
+		Tape lowerTape = new Tape();
 		for (char ch : "abcd".toCharArray()) {
 			lowerTape.write(ch);
 		}
 		lowerTape.setPosition(0);
 
 		// create the lexical tape
-		Tape lexicalTape = new Tape(lexicalAlphabet);
+		Tape lexicalTape = new Tape();
 
 		// create the start and end state
 		State<ResultCollector> startState = new State<ResultCollector>();

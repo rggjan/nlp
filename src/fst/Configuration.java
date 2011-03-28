@@ -51,12 +51,14 @@ public class Configuration<TCollector extends IResultCollector> {
 			
 			// leave the current state, cross the link and enter the target state
 			currentState.leave(link, configuration);
-			link.cross(currentState, configuration);
-			configuration.setCurrentState(target);
-			target.enter(link, currentState, configuration);
-			
-			// do the recursive call
-			configuration.run();
+			if (link.cross(currentState, configuration)){
+				// only do the rest if it was possible to cross the link
+				configuration.setCurrentState(target);
+				target.enter(link, currentState, configuration);
+				
+				// do the recursive call
+				configuration.run();
+			}
 		}
 		
 		// remove the configuration from the active configurations
