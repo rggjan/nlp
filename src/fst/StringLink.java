@@ -23,4 +23,9 @@ public class StringLink extends Link<ResultCollector>{
 		}
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return lowerString+"->"+upperString;
+	}
 }

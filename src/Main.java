@@ -1,8 +1,10 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import dom.Text;
 import fst.Configuration;
+import fst.FstPrinter;
 import fst.ResultCollector;
 import fst.State;
 import fst.StringLink;
@@ -53,6 +55,17 @@ public class Main {
 		// add second link
 		middleState.addLink(new StringLink("bcd", "bcd", endState));
 
+		try {
+			FstPrinter.print(startState, new PrintStream("graph.dot"));
+			Runtime.getRuntime().exec(new String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// TODO Why does this give a result ab^ ... ?
 
 		// add infinite link
