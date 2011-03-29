@@ -43,8 +43,12 @@ public class Main {
 		pastWordEndState.setAccepting(true);
 
 		// add empty prefixes and suffixes
-		startState.addLink(new StringLink("", "", preStemState));
-		postStemState.addLink(new StringLink("", "", finalState));
+		StringLink link = new StringLink("", "", preStemState);
+		link.setWeight(0);
+		startState.addLink(link);
+		link = new StringLink("", "", finalState);
+		link.setWeight(0);
+		postStemState.addLink(link);
 
 		// add word end link
 		finalState.addLink(new StringLink("#", "", pastWordEndState));
@@ -54,16 +58,14 @@ public class Main {
 			if (part.name == "")
 				continue;
 
-			StringLink link = new StringLink(part.name, part.name + "^",
-					preStemState);
+			link = new StringLink(part.name, part.name + "^", preStemState);
 			link.setWeight(part.frequency);
 			startState.addLink(link);
 		}
 
 		// add links for the stems
 		for (WordPart part : trainingText.stems.values()) {
-			StringLink link = new StringLink(part.name, part.name,
-					postStemState);
+			link = new StringLink(part.name, part.name, postStemState);
 			link.setWeight(part.frequency);
 			preStemState.addLink(link);
 		}
