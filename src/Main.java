@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import dom.Text;
 import dom.Word;
@@ -14,7 +15,7 @@ import fst.Tape;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		Text trainingText = new Text("Data/Train.txt");
 		Text testText = new Text("Data/Test.txt");
 
@@ -30,10 +31,38 @@ public class Main {
 		}
 
 		trainingText.generateWords();
-		trainingText.searchForPrefixes();
-		trainingText.searchForSuffixes();
-		trainingText.generateStatistics();
-
+		trainingText.generateAffixes();
+		
+		// print statistics
+		
+		
+		int wordCount=trainingText.getWords().size();
+		
+		System.out.println("Prefixes");
+		for (WordPart part:trainingText.getPrefixes()){
+			if (part.name=="") continue;
+			if (part.countUniqueValidWords(wordCount)<2) continue;
+			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
+			
+		}
+		
+		System.out.println("Stems");
+		for (WordPart part:trainingText.getStems()){
+			if (part.name=="") continue;
+			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
+			
+		}
+		
+		System.out.println("Suffixes");
+		for (WordPart part:trainingText.getSuffixes()){
+			if (part.name=="") continue;
+			if (part.countUniqueValidWords(wordCount)<2) continue;
+			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
+			
+		}
+		
+		
+		
 		// create the states
 		State<ResultCollector> startState = new State<ResultCollector>(), preStemState = new State<ResultCollector>(), postStemState = new State<ResultCollector>(), finalState = new State<ResultCollector>(), pastWordEndState = new State<ResultCollector>();
 
@@ -43,40 +72,45 @@ public class Main {
 		pastWordEndState.setAccepting(true);
 
 		// add empty prefixes and suffixes
-		StringLink link = new StringLink("", "", preStemState);
+		StringLink link = new StringLink("", "_^", preStemState);
 		link.setWeight(0);
 		startState.addLink(link);
-		link = new StringLink("", "", finalState);
+		link = new StringLink("", "^_", finalState);
 		link.setWeight(0);
 		postStemState.addLink(link);
 
 		// add word end link
 		finalState.addLink(new StringLink("#", "", pastWordEndState));
 
+		
+		
 		// add links for the prefixes
-		for (WordPart part : trainingText.prefixes.values()) {
-			if (part.name == "")
-				continue;
+		for (WordPart part : trainingText.getPrefixes()) {
+			if (part.name.equals("")) continue;
+			if (part.countUniqueValidWords(wordCount)<2) continue;
 
 			link = new StringLink(part.name, part.name + "^", preStemState);
-			link.setWeight(part.frequency);
+			link.setWeight(part.countUniqueValidWords(wordCount));
 			startState.addLink(link);
 		}
 
 		// add links for the stems
-		for (WordPart part : trainingText.stems.values()) {
+		for (WordPart part : trainingText.getStems()) {
+			// do not filter the stems
 			link = new StringLink(part.name, part.name, postStemState);
-			link.setWeight(part.frequency);
+			link.setWeight(part.countUniqueValidWords(wordCount));
+			//link.setWeight(part.frequency);
 			preStemState.addLink(link);
 		}
 
 		// add links for the suffixes
-		for (WordPart part : trainingText.suffixes.values()) {
-			if (part.name == "")
-				continue;
-
+		for (WordPart part : trainingText.getSuffixes()) {
+			if (part.name.equals("")) continue;
+			if (part.countUniqueValidWords(wordCount)<2) continue;
+			
 			link = new StringLink(part.name, "^" + part.name, finalState);
-			link.setWeight(part.frequency);
+			link.setWeight(part.countUniqueValidWords(wordCount));
+			//link.setWeight(part.frequency);
 			postStemState.addLink(link);
 		}
 
@@ -93,7 +127,7 @@ public class Main {
 		}
 
 		testText.generateWords();
-		for (Word word : testText.words) {
+		for (Word word : testText.getWords()) {
 			// create and fill the input tape
 			Tape inputTape = new Tape();
 			for (char ch : word.getName().toCharArray()) {
@@ -118,8 +152,18 @@ public class Main {
 			System.out.printf("%s\n", word.getName());
 			for (Configuration<ResultCollector> conf : collector
 					.getAcceptingConfigurations()) {
-				System.out.printf("  %s (%.2f)\n", conf.getOutputTape(), conf
-						.getProbability());
+				String[] parts=conf.getOutputTape().toString().split("\\^");
+				WordPart prefix=null,stem=null,suffix=null;
+				if (!"_".equals(parts[0])) prefix=trainingText.getPrefix(parts[0]);
+				stem=trainingText.getStem(parts[1]);
+				if (!"_".equals(parts[2])) suffix=trainingText.getSuffix(parts[2]);
+				
+				System.out.printf("  %s (%.2f) %d %d %d\n", conf.getOutputTape(), conf
+						.getProbability(),
+						prefix!=null?prefix.countUniqueValidWords(wordCount):0,
+						stem!=null?stem.countUniqueValidWords(wordCount):0,
+						suffix!=null?suffix.countUniqueValidWords(wordCount):0
+								);
 			}
 		}
 	}

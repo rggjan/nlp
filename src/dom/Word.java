@@ -20,36 +20,18 @@ public class Word {
 		return Collections.unmodifiableList(splittings);
 	}
 
-	public void generateSplittings(HashMap<String, WordPart> prefixes,
-			HashMap<String, WordPart> suffixes, HashMap<String, WordPart> stems) {
-		int length = name.length();
-
-		for (int stem_start = 0; stem_start < length; stem_start++) {
-			for (int suffix_start = stem_start + 1; suffix_start <= length; suffix_start++) {
-				WordPart prefix = prefixes.get(name.substring(0, stem_start));
-				WordPart suffix = suffixes.get(name.substring(suffix_start,
-						length));
-
-				if (prefix != null && suffix != null) {
-					String stem_string = name.substring(stem_start,
-							suffix_start);
-					WordPart stem = stems.get(stem_string);
-
-					if (stem == null) {
-						stem = new WordPart(stem_string);
-						stems.put(stem_string, stem);
-					}
-
-					// System.out.println(prefix.name + "/" + stem.name + "/"
-					// + suffix.name);
-					this.addSplitting(new Splitting(prefix, stem, suffix));
-				}
+	public void generateAllPossibleSplittings(Text text) {
+		// i and j iterate over the gaps between the characters
+		// string:   a b c d e
+		// indices: 0 1 2 3 4 5
+		for (int i=0; i<=4; i++){
+			for (int j=name.length();j>i;j--){
+				WordPart prefix=text.getOrAddPrefix(name.substring(0,i));
+				WordPart stem=text.getOrAddStem(name.substring(i,j));
+				WordPart suffix=text.getOrAddSuffix(name.substring(j,name.length()));
+				
+				addSplitting(new Splitting(prefix, stem, suffix));
 			}
-		}
-
-		float size = splittings.size();
-		for (Splitting s : splittings) {
-			s.increaseFrequency(1 / size);
 		}
 	}
 
@@ -75,5 +57,17 @@ public class Word {
 
 	public String getName() {
 		return name;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Word)) return false;
+		Word other=(Word) obj;
+		return name.equals(other.name);
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
 	}
 }

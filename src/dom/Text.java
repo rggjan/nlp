@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Text {
-	public Collection<Word> words = new ArrayList<Word>();
+	private HashMap<String,Word> words = new HashMap<String,Word>();
 
 	private final String filename;
 	private String rawText;
 
-	public HashMap<String, WordPart> prefixes = new HashMap<String, WordPart>();
-	public HashMap<String, WordPart> suffixes = new HashMap<String, WordPart>();
-	public HashMap<String, WordPart> stems = new HashMap<String, WordPart>();
+	private HashMap<String, WordPart> prefixes = new HashMap<String, WordPart>();
+	private HashMap<String, WordPart> suffixes = new HashMap<String, WordPart>();
+	private HashMap<String, WordPart> stems = new HashMap<String, WordPart>();
 
 	public void readText() throws IOException {
 		BufferedReader br;
@@ -47,109 +47,79 @@ public class Text {
 		String text = rawText.toLowerCase();
 		text = text.replaceAll("[,.;!?*():\"'-]+", " ");
 
-		HashMap<String, Word> map = new HashMap<String, Word>();
-
 		for (String s : text.trim().split("\\s+")) {
-			Word w = map.get(s);
+			if (s=="") continue;
+			Word w = words.get(s);
 			if (w == null)
-				map.put(s, new Word(s));
+				words.put(s, new Word(s));
 			else
 				w.count++;
 		}
-
-		words = map.values();
 	}
 
-	public void searchForSuffixes() {
-		HashMap<String, WordPart> tmp_suffixes = searchForAffixes(new StringBuffer(
-				rawText).reverse().toString());
-
-		for (WordPart s : tmp_suffixes.values()) {
-			s.name = new StringBuffer(s.name).reverse().toString();
-			suffixes.put(s.name, s);
+	public void generateAffixes() {
+		// generate splittings
+		for (Word word: words.values()){
+			word.generateAllPossibleSplittings(this);
 		}
-
-		suffixes.put("", new WordPart(""));
 	}
-
-	public void searchForPrefixes() {
-		prefixes = searchForAffixes(rawText);
-
-		prefixes.put("", new WordPart(""));
+	
+	public WordPart getPrefix(String name){
+		return prefixes.get(name);
 	}
-
-	private HashMap<String, WordPart> searchForAffixes(String text) {
-		HashMap<String, WordPart> affixes = new HashMap<String, WordPart>();
-
-		// Normalize the text
-		text = text.toLowerCase();
-		text = text.replaceAll("[,.;!?*():\"'-]+", " ");
-
-		List<String> wordlist = Arrays.asList(text.trim().split("\\s+"));
-
-		// Find all prefixes
-		for (int i = 4; i >= 1; i--) {
-			// i is the length of the prefix to be tried
-			List<String> newlist = new ArrayList<String>();
-
-			// maps prefixes to the stems that follow
-			HashMap<String, HashSet<String>> prefix_hash = new HashMap<String, HashSet<String>>();
-
-			// Iterate over all words
-			for (String word : wordlist) {
-				if (word.length() <= i) {
-					newlist.add(word);
-					continue;
-				}
-
-				String prefix = word.substring(0, i);
-				String stem = word.substring(i, word.length());
-
-				HashSet<String> set = prefix_hash.get(prefix);
-
-				if (set == null) {
-					set = new HashSet<String>();
-					prefix_hash.put(prefix, set);
-				}
-
-				set.add(stem);
-			}
-
-			// Get all real prefixes
-			for (Map.Entry<String, HashSet<String>> entry : prefix_hash
-					.entrySet()) {
-				String prefix = entry.getKey();
-				HashSet<String> set = entry.getValue();
-
-				if (set.size() > 1) {
-					affixes.put(prefix, new WordPart(prefix));
-					// Only take prefixes that occur in multiple words
-					/*
-					 * for (String stem : set) { System.out.println(prefix + "/"
-					 * + stem); }
-					 */
-				} else {
-					// We didn't have a prefix... put the word together again
-					newlist.add(prefix + set.iterator().next());
-				}
-			}
-
-			// replace the word list
-			// the newlist only contains words which were not yet used to
-			// build a prefix
-			wordlist = newlist;
-		}
-
-		return affixes;
+	
+	public WordPart getStem(String name){
+		return stems.get(name);
 	}
-
-	public void generateStatistics() {
-		for (Word w : words) {
-			w.generateSplittings(prefixes, suffixes, stems);
+	
+	public WordPart getSuffix(String name){
+		return suffixes.get(name);
+	}
+	
+	public WordPart getOrAddPrefix(String name){
+		if (prefixes.containsKey(name)){
+			return prefixes.get(name);
 		}
-
-		for (WordPart p : stems.values()) {
-			// System.out.println(p.name + ": " + p.frequency);
+		else{
+			WordPart result=new WordPart(name);
+			prefixes.put(name, result);
+			return result;
 		}
+	}
+	
+	public WordPart getOrAddStem(String name){
+		if (stems.containsKey(name)){
+			return stems.get(name);
+		}
+		else{
+			WordPart result=new WordPart(name);
+			stems.put(name, result);
+			return result;
+		}
+	}
+	
+	public WordPart getOrAddSuffix(String name){
+		if (suffixes.containsKey(name)){
+			return suffixes.get(name);
+		}
+		else{
+			WordPart result=new WordPart(name);
+			suffixes.put(name, result);
+			return result;
+		}
+	}
+	
+	public Collection<WordPart> getPrefixes(){
+		return prefixes.values();
+	}
+	public Collection<WordPart> getStems(){
+		return stems.values();
+	}
+	public Collection<WordPart> getSuffixes(){
+		return suffixes.values();
+	}
+	
+	public Collection<Word> getWords(){
+		return words.values();
 	}
 }

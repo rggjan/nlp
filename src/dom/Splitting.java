@@ -78,11 +78,21 @@ public class Splitting {
 	public WordPart getPrefix() {
 		return prefix;
 	}
-
-	public void increaseFrequency(float f) {
-		prefix.frequency += f;
-		stem.frequency += f;
-		suffix.frequency += f;
+	
+	/**
+	 * Return true if this is a valid splitting
+	 * @param wordCount
+	 * @return
+	 */
+	public boolean isValid(int wordCount){
+		// accept the whole word
+		if ("".equals(prefix.name)&&"".equals(suffix.name)) return true;
+		
+		// check word parts
+		if (!"".equals(prefix.name)&&prefix.getUniqueWords().size()<2) return false;
+		if (stem.getUniqueWords().size()<2) return false;
+		if (!"".equals(suffix.name)&&suffix.getUniqueWords().size()<2) return false;
+		
+		return true;
 	}
-
 }
