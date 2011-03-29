@@ -75,8 +75,7 @@ public class Main {
 			if (part.name == "")
 				continue;
 
-			StringLink link = new StringLink(part.name, "^" + part.name,
-					finalState);
+			link = new StringLink(part.name, "^" + part.name, finalState);
 			link.setWeight(part.frequency);
 			postStemState.addLink(link);
 		}
