@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Text {
-	private Collection<Word> words = new ArrayList<Word>();
+	public Collection<Word> words = new ArrayList<Word>();
 
 	private final String filename;
 	private String rawText;

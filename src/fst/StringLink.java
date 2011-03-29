@@ -13,13 +13,13 @@ public class StringLink extends Link<ResultCollector>{
 	@Override
 	public boolean cross(State<ResultCollector> source, Configuration<ResultCollector> configuration) {
 		super.cross(source, configuration);
-		Tape lowerHead=configuration.getLowerTape();
+		Tape lowerHead=configuration.getInputTape();
 		for (char ch: lowerString.toCharArray()){
 			if (!lowerHead.canRead()) return false;
 			if (ch!=lowerHead.read()) return false;
 		}
 		for (char ch: upperString.toCharArray()){
-			configuration.getUpperTape().write(ch);
+			configuration.getOutputTape().write(ch);
 		}
 		return true;
 	}

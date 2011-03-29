@@ -8,7 +8,7 @@ import java.util.List;
 public class Word {
 	private final List<Splitting> splittings = new ArrayList<Splitting>();
 
-	String name;
+	private String name;
 
 	public int count = 1;
 
@@ -71,5 +71,9 @@ public class Word {
 
 	void removeSplittingImp(Splitting splitting) {
 		splittings.remove(splitting);
+	}
+
+	public String getName() {
+		return name;
 	}
 }
