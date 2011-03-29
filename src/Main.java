@@ -75,10 +75,10 @@ public class Main {
 					finalState));
 		}
 
-		
 		try {
 			FstPrinter.print(startState, new PrintStream("graph.dot"));
-			//Runtime.getRuntime().exec(new String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
+			// Runtime.getRuntime().exec(new
+			// String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,8 +113,8 @@ public class Main {
 			System.out.printf("%s\n", word.getName());
 			for (Configuration<ResultCollector> conf : collector
 					.getAcceptingConfigurations()) {
-				System.out.printf("  %s (%.1f %%)\n", conf.getOutputTape(),
-						conf.getProbability() * 100);
+				System.out.printf("  %s (%.2f)\n", conf.getOutputTape(), conf
+						.getProbability());
 			}
 		}
 	}
