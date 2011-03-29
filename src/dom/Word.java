@@ -2,13 +2,12 @@ package dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class Word {
 	private final List<Splitting> splittings = new ArrayList<Splitting>();
 
-	private String name;
+	private final String name;
 
 	public int count = 1;
 
@@ -22,14 +21,15 @@ public class Word {
 
 	public void generateAllPossibleSplittings(Text text) {
 		// i and j iterate over the gaps between the characters
-		// string:   a b c d e
+		// string: a b c d e
 		// indices: 0 1 2 3 4 5
-		for (int i=0; i<=4; i++){
-			for (int j=name.length();j>i;j--){
-				WordPart prefix=text.getOrAddPrefix(name.substring(0,i));
-				WordPart stem=text.getOrAddStem(name.substring(i,j));
-				WordPart suffix=text.getOrAddSuffix(name.substring(j,name.length()));
-				
+		for (int i = 0; i <= 4; i++) {
+			for (int j = name.length(); j > Math.max(i, name.length() - 5); j--) {
+				WordPart prefix = text.getOrAddPrefix(name.substring(0, i));
+				WordPart stem = text.getOrAddStem(name.substring(i, j));
+				WordPart suffix = text.getOrAddSuffix(name.substring(j, name
+						.length()));
+
 				addSplitting(new Splitting(prefix, stem, suffix));
 			}
 		}
@@ -58,14 +58,15 @@ public class Word {
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Word)) return false;
-		Word other=(Word) obj;
+		if (!(obj instanceof Word))
+			return false;
+		Word other = (Word) obj;
 		return name.equals(other.name);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return name.hashCode();
