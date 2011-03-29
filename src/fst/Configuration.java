@@ -11,8 +11,8 @@ import java.util.LinkedList;
  *
  */
 public class Configuration<TCollector extends IResultCollector> {
-	private Tape lowerTape;
-	private Tape upperTape;
+	private Tape inputTape;
+	private Tape outputTape;
 	private State<TCollector> currentState;
 	private TCollector collector;
 	private final HashSet<Configuration<TCollector>> activeConfigurations;
@@ -21,16 +21,16 @@ public class Configuration<TCollector extends IResultCollector> {
 	public Configuration(State<TCollector> startState, Tape lowerTape, Tape upperTape, TCollector collector) {
 		this.collector=collector;
 		currentState=startState;
-		this.lowerTape=lowerTape;
-		this.upperTape=upperTape;
+		this.inputTape=lowerTape;
+		this.outputTape=upperTape;
 		activeConfigurations=new HashSet<Configuration<TCollector>>();
 	}
 	
 	public Configuration(Configuration<TCollector> other) {
 		collector=other.collector;
 		currentState=other.currentState;
-		lowerTape=new Tape(other.lowerTape);
-		upperTape=new Tape(other.upperTape);
+		inputTape=new Tape(other.inputTape);
+		outputTape=new Tape(other.outputTape);
 		activeConfigurations=other.activeConfigurations;
 		probability=other.probability;
 	}
@@ -90,12 +90,12 @@ public class Configuration<TCollector extends IResultCollector> {
 	}
 
 
-	public Tape getLowerTape() {
-		return lowerTape;
+	public Tape getInputTape() {
+		return inputTape;
 	}
 
-	public Tape getUpperTape() {
-		return upperTape;
+	public Tape getOutputTape() {
+		return outputTape;
 	}
 	
 	@Override
@@ -104,7 +104,7 @@ public class Configuration<TCollector extends IResultCollector> {
 		Configuration<?> other=(Configuration<?>) obj;
 		if (currentState!=other.currentState) return false;
 		if (collector!=other.collector) return false;
-		if (!areEqual(lowerTape,other.lowerTape)) return false;
+		if (!areEqual(inputTape,other.inputTape)) return false;
 		//if (!areEqual(upperTape,other.upperTape)) return false;
 		return true;
 	}
@@ -114,7 +114,7 @@ public class Configuration<TCollector extends IResultCollector> {
 		int hash=1;
 		hash=hash*31+currentState.hashCode();
 		hash=hash*31+collector.hashCode();
-		if (lowerTape!=null) hash=hash*31+lowerTape.hashCode();
+		if (inputTape!=null) hash=hash*31+inputTape.hashCode();
 		//if (upperTape!=null) hash=hash*31+upperTape.hashCode();
 		return hash;
 	}

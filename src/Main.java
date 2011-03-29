@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import dom.Text;
+import dom.Word;
+import dom.WordPart;
 import fst.Configuration;
 import fst.FstPrinter;
 import fst.ResultCollector;
@@ -13,10 +15,12 @@ import fst.Tape;
 public class Main {
 
 	public static void main(String[] args) {
-		Text text = new Text("Data/Train.txt");
+		Text trainingText = new Text("Data/Train.txt");
+		Text testText = new Text("Data/Test.txt");
 
 		try {
-			text.readText();
+			trainingText.readText();
+			testText.readText();
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found!");
 			System.exit(1);
@@ -25,44 +29,50 @@ public class Main {
 			System.exit(1);
 		}
 
-		text.generateWords();
-		text.searchForPrefixes();
-		text.searchForSuffixes();
-		text.generateStatistics();
+		trainingText.generateWords();
+		trainingText.searchForPrefixes();
+		trainingText.searchForSuffixes();
+		trainingText.generateStatistics();
 
-		// create and fill the lower tape
-		Tape lowerTape = new Tape();
-		for (char ch : "abcd".toCharArray()) {
-			lowerTape.write(ch);
-		}
-		lowerTape.setPosition(0);
+		// create the states
+		State<ResultCollector> 
+			startState = new State<ResultCollector>(),
+			preStemState=new State<ResultCollector>(),
+			postStemState=new State<ResultCollector>(),
+			finalState=new State<ResultCollector>(),
+			pastWordEndState=new State<ResultCollector>();
 
-		// create the lexical tape
-		Tape lexicalTape = new Tape();
+		// for testing the fst, we'll add # to the end of every word.
+		// this makes sure the whole word is parsed before reaching the
+		// accepting state
+		pastWordEndState.setAccepting(true);
 
-		// create the start and end state
-		State<ResultCollector> startState = new State<ResultCollector>();
-
-		State<ResultCollector> middleState = new State<ResultCollector>();
-
-		State<ResultCollector> endState = new State<ResultCollector>();
-		endState.setAccepting(true);
-
-		// add first link
-		startState.addLink(new StringLink("a", "a^", middleState));
-		startState.addLink(new StringLink("a", "X^", middleState));
-		startState.addLink(new StringLink("ab", "ab^", middleState));
-
-		// add second link
-		middleState.addLink(new StringLink("bcd", "bcd", endState));
+		// add empty prefixes and suffixes
+		startState.addLink(new StringLink("", "", preStemState));
+		postStemState.addLink(new StringLink("", "", finalState));
 		
-		// add infinite link
-		endState.addLink(new StringLink("", "i", endState));
+		// add word end link
+		finalState.addLink(new StringLink("#", "", pastWordEndState));
+		
+		// add links for the prefixes
+		for (WordPart part:trainingText.prefixes.values()){
+			startState.addLink(new StringLink(part.name, part.name+"^", preStemState));
+		}
+		
+		// add links for the stems
+		for (WordPart part:trainingText.stems.values()){
+			preStemState.addLink(new StringLink(part.name, part.name, postStemState));
+		}
+		
+		// add links for the postfixes
+		for (WordPart part:trainingText.stems.values()){
+			postStemState.addLink(new StringLink(part.name, "^"+part.name, finalState));
+		}
 
-
+		
 		try {
 			FstPrinter.print(startState, new PrintStream("graph.dot"));
-			Runtime.getRuntime().exec(new String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
+			//Runtime.getRuntime().exec(new String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,18 +82,34 @@ public class Main {
 		}
 		
 
-		
-		// create the result collector
-		ResultCollector collector = new ResultCollector();
-
-		// run the configuration
-		Configuration<ResultCollector> config = new Configuration<ResultCollector>(
-				startState, lowerTape, lexicalTape, collector);
-		config.run();
-
-		for (Configuration<ResultCollector> conf : collector
-				.getAcceptingConfigurations()) {
-			System.out.printf("Result: (%f) %s\n ",conf.getProbability(),conf.getUpperTape());
+		testText.generateWords();
+		for (Word word:testText.words){
+			// create and fill the input tape
+			Tape inputTape = new Tape();
+			for (char ch : word.getName().toCharArray()) {
+				inputTape.write(ch);
+			}
+			// add the final # to mark the end of the word
+			inputTape.write('#');
+			inputTape.setPosition(0);
+	
+			// create the output tape
+			Tape outputTape = new Tape();
+			
+			// create the result collector
+			ResultCollector collector = new ResultCollector();
+	
+			// run the configuration
+			Configuration<ResultCollector> config = new Configuration<ResultCollector>(
+					startState, inputTape, outputTape, collector);
+			config.run();
+	
+			collector.sortAcceptionConfigurations();
+			System.out.printf("%s\n", word.getName());
+			for (Configuration<ResultCollector> conf : collector
+					.getAcceptingConfigurations()) {
+				System.out.printf("  %s (%.1f)\n",conf.getOutputTape(),conf.getProbability());
+			}
 		}
 	}
 }
