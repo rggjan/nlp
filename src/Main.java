@@ -55,24 +55,30 @@ public class Main {
 			if (part.name == "")
 				symbol = "";
 
-			startState.addLink(new StringLink(part.name, part.name + symbol,
-					preStemState));
+			StringLink link = new StringLink(part.name, part.name + symbol,
+					preStemState);
+			link.setWeight(part.frequency);
+			startState.addLink(link);
 		}
 
 		// add links for the stems
 		for (WordPart part : trainingText.stems.values()) {
-			preStemState.addLink(new StringLink(part.name, part.name,
-					postStemState));
+			StringLink link = new StringLink(part.name, part.name,
+					postStemState);
+			link.setWeight(part.frequency);
+			preStemState.addLink(link);
 		}
 
-		// add links for the postfixes
-		for (WordPart part : trainingText.stems.values()) {
+		// add links for the suffixes
+		for (WordPart part : trainingText.suffixes.values()) {
 			String symbol = "^";
 			if (part.name == "")
 				symbol = "";
 
-			postStemState.addLink(new StringLink(part.name, symbol + part.name,
-					finalState));
+			StringLink link = new StringLink(part.name, symbol + part.name,
+					finalState);
+			link.setWeight(part.frequency);
+			postStemState.addLink(link);
 		}
 
 		try {
