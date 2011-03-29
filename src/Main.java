@@ -43,8 +43,8 @@ public class Main {
 		pastWordEndState.setAccepting(true);
 
 		// add empty prefixes and suffixes
-		// startState.addLink(new StringLink("", "", preStemState));
-		// postStemState.addLink(new StringLink("", "", finalState));
+		startState.addLink(new StringLink("", "", preStemState));
+		postStemState.addLink(new StringLink("", "", finalState));
 
 		// add word end link
 		finalState.addLink(new StringLink("#", "", pastWordEndState));
