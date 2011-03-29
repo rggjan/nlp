@@ -82,8 +82,9 @@ public class Main {
 
 		try {
 			FstPrinter.print(startState, new PrintStream("graph.dot"));
-			// Runtime.getRuntime().exec(new
-			// String[]{"dot","-o","graph.gif","-T","gif","graph.dot"});
+			Runtime.getRuntime().exec(
+					new String[] { "dot", "-o", "graph.gif", "-T", "gif",
+							"graph.dot" });
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

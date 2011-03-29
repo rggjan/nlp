@@ -44,7 +44,8 @@ public class FstPrinter<T extends IResultCollector> {
 				: "");
 
 		// print output for all links leaving the state
-		for (Link<T> link : state.getLinks()) {
+		for (Link<T> link : state.getLinks().subList(1,
+				Math.min(20, state.getLinks().size()))) {
 			out.printf("%d->%d [label=\"(%.1f)%s\"];\n", getId(state),
 					getId(link.getTarget()), link.getWeight(), link.toString());
 
