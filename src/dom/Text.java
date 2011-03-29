@@ -61,11 +61,12 @@ public class Text {
 	}
 
 	public void searchForSuffixes() {
-		suffixes = searchForAffixes(new StringBuffer(rawText).reverse()
-				.toString());
+		HashMap<String, WordPart> tmp_suffixes = searchForAffixes(new StringBuffer(
+				rawText).reverse().toString());
 
-		for (WordPart s : suffixes.values()) {
+		for (WordPart s : tmp_suffixes.values()) {
 			s.name = new StringBuffer(s.name).reverse().toString();
+			suffixes.put(s.name, s);
 		}
 
 		suffixes.put("", new WordPart(""));
