@@ -42,7 +42,7 @@ public class FstPrinter<T extends IResultCollector> {
 		
 		// print output for all links leaving the state
 		for(Link<T> link:state.getLinks()){
-			out.printf("%d->%d [label=\"%s\"];\n", getId(state),getId(link.getTarget()),link.toString());
+			out.printf("%d->%d [label=\"(%.1f)%s\"];\n", getId(state),getId(link.getTarget()),link.getWeight(),link.toString());
 			
 			// recursively print states
 			printRec(link.getTarget());

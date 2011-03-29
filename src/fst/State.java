@@ -14,8 +14,8 @@ public class State<TCollector extends IResultCollector> {
 	public List<Link<TCollector>> getLinks(){
 		return Collections.unmodifiableList(links);
 	}
-	public void leave(Link<TCollector> link, Configuration<TCollector> configuration){}
-	public void enter(Link<TCollector> link, State<TCollector> source, Configuration<TCollector> configuration){}
+
+	
 	public void setAccepting(boolean accepting) {
 		this.accepting = accepting;
 	}

@@ -3,6 +3,7 @@ package fst;
 import static fst.Utils.*;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Represents a configuration of a transducer
@@ -15,6 +16,7 @@ public class Configuration<TCollector extends IResultCollector> {
 	private State<TCollector> currentState;
 	private TCollector collector;
 	private final HashSet<Configuration<TCollector>> activeConfigurations;
+	private float probability=1;
 	
 	public Configuration(State<TCollector> startState, Tape lowerTape, Tape upperTape, TCollector collector) {
 		this.collector=collector;
@@ -30,6 +32,7 @@ public class Configuration<TCollector extends IResultCollector> {
 		lowerTape=new Tape(other.lowerTape);
 		upperTape=new Tape(other.upperTape);
 		activeConfigurations=other.activeConfigurations;
+		probability=other.probability;
 	}
 
 	public void run(){
@@ -42,6 +45,9 @@ public class Configuration<TCollector extends IResultCollector> {
 		if (activeConfigurations.contains(this)) return;
 		activeConfigurations.add(this);
 		
+		LinkedList<Configuration<TCollector>> outgoingConfigurations=new LinkedList<Configuration<TCollector>>();
+		float totalWeight=0;
+		
 		// run this configuration
 		for (Link<TCollector> link:currentState.getLinks()){
 			State<TCollector> target = link.getTarget();
@@ -50,15 +56,25 @@ public class Configuration<TCollector extends IResultCollector> {
 			Configuration<TCollector> configuration=new Configuration<TCollector>(this);
 			
 			// leave the current state, cross the link and enter the target state
-			currentState.leave(link, configuration);
 			if (link.cross(currentState, configuration)){
 				// only do the rest if it was possible to cross the link
 				configuration.setCurrentState(target);
-				target.enter(link, currentState, configuration);
 				
-				// do the recursive call
-				configuration.run();
+				// multiply with the unweighted weight of the link
+				configuration.probability*=link.getWeight();
+				totalWeight+=link.getWeight();
+				
+				// collect outgoing configurations
+				outgoingConfigurations.add(configuration);
 			}
+		}
+		
+		for (Configuration<TCollector> configuration:outgoingConfigurations){
+			// weighten the probabilities
+			configuration.probability/=totalWeight;
+			
+			// do the recursive call
+			configuration.run();
 		}
 		
 		// remove the configuration from the active configurations
@@ -101,6 +117,10 @@ public class Configuration<TCollector extends IResultCollector> {
 		if (lowerTape!=null) hash=hash*31+lowerTape.hashCode();
 		//if (upperTape!=null) hash=hash*31+upperTape.hashCode();
 		return hash;
+	}
+
+	public float getProbability() {
+		return probability;
 	}
 	
 	

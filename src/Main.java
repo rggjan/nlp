@@ -50,10 +50,15 @@ public class Main {
 
 		// add first link
 		startState.addLink(new StringLink("a", "a^", middleState));
+		startState.addLink(new StringLink("a", "X^", middleState));
 		startState.addLink(new StringLink("ab", "ab^", middleState));
 
 		// add second link
 		middleState.addLink(new StringLink("bcd", "bcd", endState));
+		
+		// add infinite link
+		endState.addLink(new StringLink("", "i", endState));
+
 
 		try {
 			FstPrinter.print(startState, new PrintStream("graph.dot"));
@@ -66,11 +71,8 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		// TODO Why does this give a result ab^ ... ?
 
-		// add infinite link
-		// endState.addLink(new StringLink("", "i", endState));
-
+		
 		// create the result collector
 		ResultCollector collector = new ResultCollector();
 
@@ -81,7 +83,7 @@ public class Main {
 
 		for (Configuration<ResultCollector> conf : collector
 				.getAcceptingConfigurations()) {
-			System.out.println("Result: " + conf.getUpperTape());
+			System.out.printf("Result: (%f) %s\n ",conf.getProbability(),conf.getUpperTape());
 		}
 	}
 }
