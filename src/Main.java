@@ -51,11 +51,10 @@ public class Main {
 
 		// add links for the prefixes
 		for (WordPart part : trainingText.prefixes.values()) {
-			String symbol = "^";
 			if (part.name == "")
-				symbol = "";
+				continue;
 
-			StringLink link = new StringLink(part.name, part.name + symbol,
+			StringLink link = new StringLink(part.name, part.name + "^",
 					preStemState);
 			link.setWeight(part.frequency);
 			startState.addLink(link);
@@ -71,11 +70,10 @@ public class Main {
 
 		// add links for the suffixes
 		for (WordPart part : trainingText.suffixes.values()) {
-			String symbol = "^";
 			if (part.name == "")
-				symbol = "";
+				continue;
 
-			StringLink link = new StringLink(part.name, symbol + part.name,
+			StringLink link = new StringLink(part.name, "^" + part.name,
 					finalState);
 			link.setWeight(part.frequency);
 			postStemState.addLink(link);
