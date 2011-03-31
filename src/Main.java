@@ -39,7 +39,7 @@ public class Main {
 		// print statistics
 		
 		
-		printStatistics(trainingText);
+		//printStatistics(trainingText);
 		//doAnalyzing(testText, trainingText);
 		doExpanding(testText, trainingText);
 	}
@@ -65,6 +65,7 @@ public class Main {
 		
 		int count=0;
 		for (WordPart stem: trainingText.getStems()){
+			//if (stem.name.length()<2) continue;
 			count++;
 			State<ResultCollector> 
 				postStemState=new State<ResultCollector>(),
@@ -93,9 +94,9 @@ public class Main {
 				if (part.name.equals("")) continue;
 				if (part.countUniqueValidWords(wordCount)<2) continue;
 				preOutputPrefixState.addLink(new StringLink("", part.name,
-						part.countUniqueValidWords(wordCount), preOutputStemState));
+						0, preOutputStemState));
 			}
-			preOutputStemState.addLink(new StringLink("", stem.name,1, preOutputSuffixState));
+			preOutputStemState.addLink(new StringLink("", stem.name,0, preOutputSuffixState));
 			
 			// add links for all possible outputs
 			preOutputSuffixState.addLink(new StringLink("", "",0, finalState));
@@ -103,7 +104,7 @@ public class Main {
 				if (part.name.equals("")) continue;
 				if (part.countUniqueValidWords(wordCount)<2) continue;
 				preOutputSuffixState.addLink(new StringLink("", part.name,
-						part.countUniqueValidWords(wordCount), finalState));
+						0, finalState));
 			}
 			
 			finalState.setAccepting(true);
@@ -132,10 +133,14 @@ public class Main {
 
 			collector.sortAcceptionConfigurations();
 			System.out.printf("%s\n", word.getName());
-			for (Configuration<ResultCollector> conf : collector
-					.getAcceptingConfigurations()) {
-				System.out.printf("  %s (%.2f) \n", conf.getOutputTape(), conf
-						.getProbability());
+			if (collector.getAcceptingConfigurations().size()>0){
+				float weight=collector.getAcceptingConfigurations().get(0).getProbability();
+				for (Configuration<ResultCollector> conf : collector
+						.getAcceptingConfigurations()) {
+					if (conf.getProbability()<weight) break;
+					System.out.printf("  %s (%.2f) \n", conf.getOutputTape(), conf
+							.getProbability());
+				}
 			}
 			
 			
