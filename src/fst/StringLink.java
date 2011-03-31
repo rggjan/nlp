@@ -10,6 +10,12 @@ public class StringLink extends Link<ResultCollector>{
 		setTarget(target);
 	}
 	
+	public StringLink(String input, String output, float weight,
+			State<ResultCollector> target) {
+		this(input,output,target);
+		setWeight(weight);
+	}
+
 	@Override
 	public boolean cross(State<ResultCollector> source, Configuration<ResultCollector> configuration) {
 		super.cross(source, configuration);

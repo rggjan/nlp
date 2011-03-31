@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 
+import dom.CacheEnabler;
 import dom.Text;
 import dom.Word;
 import dom.WordPart;
@@ -16,8 +17,8 @@ import fst.Tape;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		Text trainingText = new Text("Data/Train.txt");
 		Text testText = new Text("Data/Test.txt");
+		Text trainingText = new Text("Data/Train.txt");
 
 		try {
 			trainingText.readText();
@@ -30,12 +31,118 @@ public class Main {
 			System.exit(1);
 		}
 
+		testText.generateWords();
 		trainingText.generateWords();
 		trainingText.generateAffixes();
 		
+		CacheEnabler.enabled=true;
 		// print statistics
 		
 		
+		printStatistics(trainingText);
+		//doAnalyzing(testText, trainingText);
+		doExpanding(testText, trainingText);
+	}
+
+	private static void doExpanding(Text testText, Text trainingText) {
+		int wordCount=trainingText.getWords().size();
+		
+		// create the states
+		State<ResultCollector> 
+			startState = new State<ResultCollector>(), 
+			preStemState = new State<ResultCollector>();
+		StringLink link;
+
+		// add links for the prefixes
+		startState.addLink(new StringLink("", "",0, preStemState));
+		for (WordPart part : trainingText.getPrefixes()) {
+			if (part.name.equals("")) continue;
+			if (part.countUniqueValidWords(wordCount)<2) continue;
+
+			startState.addLink(new StringLink(part.name,"",
+					part.countUniqueValidWords(wordCount),preStemState));
+		}
+		
+		int count=0;
+		for (WordPart stem: trainingText.getStems()){
+			count++;
+			State<ResultCollector> 
+				postStemState=new State<ResultCollector>(),
+				preOutputPrefixState=new State<ResultCollector>(),
+				preOutputStemState=new State<ResultCollector>(),
+				preOutputSuffixState=new State<ResultCollector>(),
+				finalState=new State<ResultCollector>();
+			
+			// add stem link
+			preStemState.addLink(new StringLink(stem.name, "",
+					stem.countUniqueValidWords(wordCount),postStemState));
+			
+			// add links for the suffixes
+			postStemState.addLink(new StringLink("#", "",0, preOutputPrefixState));
+			for (WordPart part : trainingText.getSuffixes()) {
+				if (part.name.equals("")) continue;
+				if (part.countUniqueValidWords(wordCount)<2) continue;
+				
+				postStemState.addLink( new StringLink(part.name+"#", "",
+						part.countUniqueValidWords(wordCount), preOutputPrefixState));
+			}
+			
+			// add links for all possible outputs
+			preOutputPrefixState.addLink(new StringLink("", "",0, preOutputStemState));
+			for (WordPart part:stem.getPrefixes()){
+				if (part.name.equals("")) continue;
+				if (part.countUniqueValidWords(wordCount)<2) continue;
+				preOutputPrefixState.addLink(new StringLink("", part.name,
+						part.countUniqueValidWords(wordCount), preOutputStemState));
+			}
+			preOutputStemState.addLink(new StringLink("", stem.name,1, preOutputSuffixState));
+			
+			// add links for all possible outputs
+			preOutputSuffixState.addLink(new StringLink("", "",0, finalState));
+			for (WordPart part:stem.getSuffixes()){
+				if (part.name.equals("")) continue;
+				if (part.countUniqueValidWords(wordCount)<2) continue;
+				preOutputSuffixState.addLink(new StringLink("", part.name,
+						part.countUniqueValidWords(wordCount), finalState));
+			}
+			
+			finalState.setAccepting(true);
+		}
+		
+		for (Word word : testText.getWords()) {
+			// create and fill the input tape
+			Tape inputTape = new Tape();
+			for (char ch : word.getName().toCharArray()) {
+				inputTape.write(ch);
+			}
+			// add the final # to mark the end of the word
+			inputTape.write('#');
+			inputTape.setPosition(0);
+
+			// create the output tape
+			Tape outputTape = new Tape();
+
+			// create the result collector
+			ResultCollector collector = new ResultCollector();
+
+			// run the configuration
+			Configuration<ResultCollector> config = new Configuration<ResultCollector>(
+					startState, inputTape, outputTape, collector);
+			config.run();
+
+			collector.sortAcceptionConfigurations();
+			System.out.printf("%s\n", word.getName());
+			for (Configuration<ResultCollector> conf : collector
+					.getAcceptingConfigurations()) {
+				System.out.printf("  %s (%.2f) \n", conf.getOutputTape(), conf
+						.getProbability());
+			}
+			
+			
+		}
+	}
+
+	private static void printStatistics(Text trainingText) {
 		int wordCount=trainingText.getWords().size();
 		
 		System.out.println("Prefixes");
@@ -60,11 +167,18 @@ public class Main {
 			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
 			
 		}
-		
-		
+	}
+
+	private static void doAnalyzing(Text testText, Text trainingText) {
+		int wordCount=trainingText.getWords().size();
 		
 		// create the states
-		State<ResultCollector> startState = new State<ResultCollector>(), preStemState = new State<ResultCollector>(), postStemState = new State<ResultCollector>(), finalState = new State<ResultCollector>(), pastWordEndState = new State<ResultCollector>();
+		State<ResultCollector> 
+			startState = new State<ResultCollector>(), 
+			preStemState = new State<ResultCollector>(), 
+			postStemState = new State<ResultCollector>(), 
+			finalState = new State<ResultCollector>(), 
+			pastWordEndState = new State<ResultCollector>();
 
 		// for testing the fst, we'll add # to the end of every word.
 		// this makes sure the whole word is parsed before reaching the
@@ -114,7 +228,7 @@ public class Main {
 			postStemState.addLink(link);
 		}
 
-		try {
+		/*try {
 			FstPrinter.print(startState, new PrintStream("graph.dot"));
 			Runtime.getRuntime().exec(
 					new String[] { "dot", "-o", "graph.gif", "-T", "gif",
@@ -125,9 +239,9 @@ public class Main {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
-		testText.generateWords();
+		
 		for (Word word : testText.getWords()) {
 			// create and fill the input tape
 			Tape inputTape = new Tape();
@@ -166,6 +280,8 @@ public class Main {
 						suffix!=null?suffix.countUniqueValidWords(wordCount):0
 								);
 			}
+			
+			
 		}
 	}
 }
