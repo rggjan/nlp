@@ -1,14 +1,11 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.HashMap;
 
 import dom.CacheEnabler;
 import dom.Text;
 import dom.Word;
 import dom.WordPart;
 import fst.Configuration;
-import fst.FstPrinter;
 import fst.ResultCollector;
 import fst.State;
 import fst.StringLink;
@@ -34,22 +31,23 @@ public class Main {
 		testText.generateWords();
 		trainingText.generateWords();
 		trainingText.generateAffixes();
-		
+		trainingText.generateStatistics();
+
 		CacheEnabler.enabled=true;
 		// print statistics
-		
-		
-		//printStatistics(trainingText);
-		//doAnalyzing(testText, trainingText);
-		doExpanding(testText, trainingText);
+
+
+		// printStatistics(trainingText);
+		doAnalyzing(testText, trainingText);
+		// doExpanding(testText, trainingText);
 	}
 
 	private static void doExpanding(Text testText, Text trainingText) {
 		int wordCount=trainingText.getWords().size();
-		
+
 		// create the states
-		State<ResultCollector> 
-			startState = new State<ResultCollector>(), 
+		State<ResultCollector>
+			startState = new State<ResultCollector>(),
 			preStemState = new State<ResultCollector>();
 		StringLink link;
 
@@ -62,32 +60,32 @@ public class Main {
 			startState.addLink(new StringLink(part.name,"",
 					part.countUniqueValidWords(wordCount),preStemState));
 		}
-		
+
 		int count=0;
 		for (WordPart stem: trainingText.getStems()){
 			//if (stem.name.length()<2) continue;
 			count++;
-			State<ResultCollector> 
+			State<ResultCollector>
 				postStemState=new State<ResultCollector>(),
 				preOutputPrefixState=new State<ResultCollector>(),
 				preOutputStemState=new State<ResultCollector>(),
 				preOutputSuffixState=new State<ResultCollector>(),
 				finalState=new State<ResultCollector>();
-			
+
 			// add stem link
 			preStemState.addLink(new StringLink(stem.name, "",
 					stem.countUniqueValidWords(wordCount),postStemState));
-			
+
 			// add links for the suffixes
 			postStemState.addLink(new StringLink("#", "",0, preOutputPrefixState));
 			for (WordPart part : trainingText.getSuffixes()) {
 				if (part.name.equals("")) continue;
 				if (part.countUniqueValidWords(wordCount)<2) continue;
-				
+
 				postStemState.addLink( new StringLink(part.name+"#", "",
 						part.countUniqueValidWords(wordCount), preOutputPrefixState));
 			}
-			
+
 			// add links for all possible outputs
 			preOutputPrefixState.addLink(new StringLink("", "",0, preOutputStemState));
 			for (WordPart part:stem.getPrefixes()){
@@ -97,7 +95,7 @@ public class Main {
 						0, preOutputStemState));
 			}
 			preOutputStemState.addLink(new StringLink("", stem.name,0, preOutputSuffixState));
-			
+
 			// add links for all possible outputs
 			preOutputSuffixState.addLink(new StringLink("", "",0, finalState));
 			for (WordPart part:stem.getSuffixes()){
@@ -106,10 +104,10 @@ public class Main {
 				preOutputSuffixState.addLink(new StringLink("", part.name,
 						0, finalState));
 			}
-			
+
 			finalState.setAccepting(true);
 		}
-		
+
 		for (Word word : testText.getWords()) {
 			// create and fill the input tape
 			Tape inputTape = new Tape();
@@ -142,47 +140,60 @@ public class Main {
 							.getProbability());
 				}
 			}
-			
-			
+
+
 		}
 	}
 
 	private static void printStatistics(Text trainingText) {
 		int wordCount=trainingText.getWords().size();
-		
+
 		System.out.println("Prefixes");
 		for (WordPart part:trainingText.getPrefixes()){
 			if (part.name=="") continue;
 			if (part.countUniqueValidWords(wordCount)<2) continue;
-			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
-			
+			System.out
+					.printf("(%d*%d=%d)%s\n", part.getUniqueWords().size(),
+							trainingText.getPrefixesCount(part.name.length()),
+					part.getUniqueWords().size() * trainingText.getPrefixesCount(part.name.length()),
+					part.name);
+
 		}
-		
+
 		System.out.println("Stems");
 		for (WordPart part:trainingText.getStems()){
 			if (part.name=="") continue;
-			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
-			
+			System.out.printf("(%d*%d=%d)%s\n", part.getUniqueWords().size(),
+					trainingText.getStemsCount(part.name.length()), part
+							.getUniqueWords().size()
+							* trainingText.getStemsCount(part.name.length()),
+					part.name);
+
 		}
-		
+
 		System.out.println("Suffixes");
 		for (WordPart part:trainingText.getSuffixes()){
 			if (part.name=="") continue;
 			if (part.countUniqueValidWords(wordCount)<2) continue;
-			System.out.printf("(%d)%s\n",part.getUniqueWords().size(),part.name);
-			
+			System.out
+					.printf("(%d*%d=%d)%s\n", part.getUniqueWords().size(),
+							trainingText.getSuffixesCount(part.name.length()),
+							part.getUniqueWords().size()
+									* trainingText.getSuffixesCount(part.name
+											.length()), part.name);
+
 		}
 	}
 
 	private static void doAnalyzing(Text testText, Text trainingText) {
 		int wordCount=trainingText.getWords().size();
-		
+
 		// create the states
-		State<ResultCollector> 
-			startState = new State<ResultCollector>(), 
-			preStemState = new State<ResultCollector>(), 
-			postStemState = new State<ResultCollector>(), 
-			finalState = new State<ResultCollector>(), 
+		State<ResultCollector>
+			startState = new State<ResultCollector>(),
+			preStemState = new State<ResultCollector>(),
+			postStemState = new State<ResultCollector>(),
+			finalState = new State<ResultCollector>(),
 			pastWordEndState = new State<ResultCollector>();
 
 		// for testing the fst, we'll add # to the end of every word.
@@ -201,15 +212,16 @@ public class Main {
 		// add word end link
 		finalState.addLink(new StringLink("#", "", pastWordEndState));
 
-		
-		
+
+
 		// add links for the prefixes
 		for (WordPart part : trainingText.getPrefixes()) {
 			if (part.name.equals("")) continue;
 			if (part.countUniqueValidWords(wordCount)<2) continue;
 
 			link = new StringLink(part.name, part.name + "^", preStemState);
-			link.setWeight(part.countUniqueValidWords(wordCount));
+			link.setWeight(part.countUniqueValidWords(wordCount)
+					* trainingText.getPrefixesCount(part.name.length()));
 			startState.addLink(link);
 		}
 
@@ -217,7 +229,8 @@ public class Main {
 		for (WordPart part : trainingText.getStems()) {
 			// do not filter the stems
 			link = new StringLink(part.name, part.name, postStemState);
-			link.setWeight(part.countUniqueValidWords(wordCount));
+			link.setWeight(part.countUniqueValidWords(wordCount)
+					* trainingText.getStemsCount(part.name.length()));
 			//link.setWeight(part.frequency);
 			preStemState.addLink(link);
 		}
@@ -226,9 +239,10 @@ public class Main {
 		for (WordPart part : trainingText.getSuffixes()) {
 			if (part.name.equals("")) continue;
 			if (part.countUniqueValidWords(wordCount)<2) continue;
-			
+
 			link = new StringLink(part.name, "^" + part.name, finalState);
-			link.setWeight(part.countUniqueValidWords(wordCount));
+			link.setWeight(part.countUniqueValidWords(wordCount)
+					* trainingText.getSuffixesCount(part.name.length()));
 			//link.setWeight(part.frequency);
 			postStemState.addLink(link);
 		}
@@ -246,7 +260,7 @@ public class Main {
 			e.printStackTrace();
 		}*/
 
-		
+
 		for (Word word : testText.getWords()) {
 			// create and fill the input tape
 			Tape inputTape = new Tape();
@@ -277,16 +291,25 @@ public class Main {
 				if (!"_".equals(parts[0])) prefix=trainingText.getPrefix(parts[0]);
 				stem=trainingText.getStem(parts[1]);
 				if (!"_".equals(parts[2])) suffix=trainingText.getSuffix(parts[2]);
-				
+
 				System.out.printf("  %s (%.2f) %d %d %d\n", conf.getOutputTape(), conf
 						.getProbability(),
-						prefix!=null?prefix.countUniqueValidWords(wordCount):0,
-						stem!=null?stem.countUniqueValidWords(wordCount):0,
-						suffix!=null?suffix.countUniqueValidWords(wordCount):0
+								prefix != null ? (prefix
+										.countUniqueValidWords(wordCount) * trainingText
+										.getPrefixesCount(prefix.name.length()))
+										: 0,
+								stem != null ? (stem
+										.countUniqueValidWords(wordCount) * trainingText
+								.getStemsCount(stem.name.length()))
+								:0,
+								suffix != null ? (suffix
+										.countUniqueValidWords(wordCount) * trainingText
+								.getSuffixesCount(suffix.name.length()))
+								:0
 								);
 			}
-			
-			
+
+
 		}
 	}
 }
