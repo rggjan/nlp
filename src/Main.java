@@ -37,8 +37,8 @@ public class Main {
 
 		// print statistics
 		// printStatistics(trainingText);
-		doAnalyzing(testText, trainingText);
-		// doExpanding(testText, trainingText);
+		// doAnalyzing(testText, trainingText);
+		doExpanding(testText, trainingText);
 	}
 
 	private static void doExpanding(Text testText, Text trainingText) {
@@ -46,7 +46,6 @@ public class Main {
 		State<ResultCollector>
 			startState = new State<ResultCollector>(),
 			preStemState = new State<ResultCollector>();
-		StringLink link;
 
 		// add links for the prefixes
 		startState.addLink(new StringLink("", "",0, preStemState));
@@ -54,8 +53,10 @@ public class Main {
 			if (part.name.equals("")) continue;
 			if (part.countUniqueValidWords()<2) continue;
 
-			startState.addLink(new StringLink(part.name,"",
-					part.countUniqueValidWords(),preStemState));
+			startState.addLink(new StringLink(part.name, "", part
+					.calculateWeigth()
+					* trainingText.getPrefixesCount(part.name.length()),
+					preStemState));
 		}
 
 		int count=0;
@@ -70,8 +71,10 @@ public class Main {
 				finalState=new State<ResultCollector>();
 
 			// add stem link
-			preStemState.addLink(new StringLink(stem.name, "",
-					stem.countUniqueValidWords(),postStemState));
+			preStemState.addLink(new StringLink(stem.name, "", stem
+					.calculateWeigth()
+					* trainingText.getStemsCount(stem.name.length()),
+					postStemState));
 
 			// add links for the suffixes
 			postStemState.addLink(new StringLink("#", "",0, preOutputPrefixState));
@@ -80,7 +83,10 @@ public class Main {
 				if (part.countUniqueValidWords()<2) continue;
 
 				postStemState.addLink( new StringLink(part.name+"#", "",
-						part.countUniqueValidWords(), preOutputPrefixState));
+ part
+						.calculateWeigth()
+						* trainingText.getSuffixesCount(part.name.length()),
+						preOutputPrefixState));
 			}
 
 			// add links for all possible outputs

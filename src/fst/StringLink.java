@@ -1,19 +1,19 @@
 package fst;
 
 public class StringLink extends Link<ResultCollector>{
-	private String lowerString;
-	private String upperString;
-	
+	private final String lowerString;
+	private final String upperString;
+
 	public StringLink(String lowerString, String upperString, State<ResultCollector> target){
 		this.lowerString=lowerString;
 		this.upperString=upperString;
 		setTarget(target);
 	}
-	
-	public StringLink(String input, String output, float weight,
+
+	public StringLink(String input, String output, double d,
 			State<ResultCollector> target) {
 		this(input,output,target);
-		setWeight(weight);
+		setWeight(d);
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class StringLink extends Link<ResultCollector>{
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return lowerString+"->"+upperString;
