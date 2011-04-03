@@ -2,8 +2,8 @@ package fst;
 
 public class Link<TCollector extends IResultCollector> {
 	private State<TCollector> target;
-	private float weight=1;
-	
+	private double weight = 1;
+
 	public boolean cross(State<TCollector> source, Configuration<TCollector> configuration){return true;}
 
 	void setTarget(State<TCollector> target) {
@@ -14,11 +14,11 @@ public class Link<TCollector extends IResultCollector> {
 		return target;
 	}
 
-	public void setWeight(float weight) {
-		this.weight = weight;
+	public void setWeight(double d) {
+		this.weight = d;
 	}
 
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 }

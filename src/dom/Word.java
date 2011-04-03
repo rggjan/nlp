@@ -2,6 +2,7 @@ package dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class Word {
@@ -70,5 +71,15 @@ public class Word {
 	@Override
 	public int hashCode() {
 		return name.hashCode();
+	}
+
+	public HashSet<Splitting> getValidSplittings() {
+		HashSet<Splitting> result = new HashSet<Splitting>();
+		for (Splitting s : splittings) {
+			if (!s.isValid())
+				continue;
+			result.add(s);
+		}
+		return result;
 	}
 }

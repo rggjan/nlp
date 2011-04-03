@@ -81,10 +81,9 @@ public class Splitting {
 
 	/**
 	 * Return true if this is a valid splitting
-	 * @param wordCount
 	 * @return
 	 */
-	public boolean isValid(int wordCount){
+	public boolean isValid(){
 		// accept the whole word
 		if ("".equals(prefix.name)&&"".equals(suffix.name)) return true;
 
