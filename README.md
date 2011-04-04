@@ -6,9 +6,10 @@ This is the code for a Class Project of the "Introduction to Natural Language Pr
 We built a little DOM. A "Word" consists of multiple "Splittings". A "Splitting" has a "WordPart" in the role
 prefix, stem and suffix
 
-"Word" 1--* "Splitting" 1-Prefix-1 "WordPart"
-                    	1-Stem-1 "WordPart"
-                    	1-Suffix-1 "WordPart"
+
+	"Word" 1--* "Splitting" 1-Prefix-1 "WordPart"
+    	                	1-Stem-1 "WordPart"
+        	            	1-Suffix-1 "WordPart"
 
 A "Text" contains prefixes, stems and suffixes which are unique within the text. (In one text instance,
 there are no two suffixes with the same name)
@@ -59,7 +60,18 @@ At the end, we can just run the transducer and get (throught the weights) differ
 
 ### Expander
 
-TODO
+The FST of the affix expander starts with links for each
+prefix to a common post prefix state. From there there is a
+link for each stem to a per stem pre suffix state. From there
+there is a link for each possible suffix, followed by a FST
+generating all possible forms (prefix/suffix combinations) 
+of the particular stem.
+
+Only the weights of the parsing part of the FST's are set,
+the weights of the generating part are all set to zero.
+
+Therefore, the probabilities of the accepting configurations 
+depend only on the score of the parsing.
 
 ### Weights
 
