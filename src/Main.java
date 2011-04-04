@@ -36,8 +36,8 @@ public class Main {
 		CacheEnabler.enabled=true;
 
 		// print statistics
-		// printStatistics(trainingText);
-		// doAnalyzing(testText, trainingText);
+		printStatistics(trainingText);
+		doAnalyzing(testText, trainingText);
 		doExpanding(testText, trainingText);
 	}
 
