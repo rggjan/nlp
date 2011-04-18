@@ -11,7 +11,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		TextParser parser = new TextParser();
 		parser.readText("data/train_1.pos");
-		System.out.println(parser.rawText);
+		parser.readTags();
 	}
 
 }
