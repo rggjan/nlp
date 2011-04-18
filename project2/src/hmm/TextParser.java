@@ -34,14 +34,6 @@ public class TextParser {
 		}
 	}
 	
-	public void addTag(String word, String tag, String previous_tag) {
-		
-	}
-	
-	public void addFinalTag(String previous_tag) {
-		
-	}
-	
 	public void readTags() {
 		tagCollection = new TagCollection();
 		
@@ -51,12 +43,14 @@ public class TextParser {
 			for (String word : sentence.split(" ")) {
 				if (word.matches("[A-Za-z-]+/[A-Z$]+")) {
 					String[] splitting = word.split("/");
-					addTag(splitting[0], splitting[1], previous_tag);
+					tagCollection.addTag(splitting[0], splitting[1], previous_tag);
 					previous_tag = splitting[1];
 				}
 			}
 			
-			addFinalTag(previous_tag);
+			// Check if whole sentence was invalid
+			if (previous_tag.length() > 0)
+				tagCollection.addFinalTag(previous_tag);
 		}
 	}
 }
