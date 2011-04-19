@@ -10,10 +10,11 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = true;		
+		final boolean simple_texts = false;		
 		
 		TextParser parser = new TextParser();
 		
+		// read training data
 		if (simple_texts) {
 			parser.readText("data/train.txt");	
 		} else {
@@ -21,16 +22,20 @@ public class Main {
 				parser.readText("data/train_" + i + ".pos");
 		}
 		
-		TagCollection collection = parser.readTags();
+		// get the state collection ( trained HMM)
+		StateCollection collection = parser.getStateCollection();
 		
+		// read the test text
 		parser = new TextParser();
 		if (simple_texts) {
 			parser.readText("data/test.txt");
 		} else {
 			parser.readText("data/test_1.pos");
 		}
-		ArrayList<ArrayList<String>> sentenceList = parser.readSentences();
+		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 		
+		// iterate ofer the test text and print the probatilities of
+		// the test sentences
 		for (ArrayList<String> sentence : sentenceList) {
 			System.out.println("===================");
 			for (String word : sentence) {
@@ -38,7 +43,7 @@ public class Main {
 			}
 			System.out.println();
 
-			System.out.println("=> " + collection.predictWithTags(sentence));
+			System.out.println("=> " + collection.calculateProbabilityofSentenceWithTags(sentence));
 		}
 	}
 
