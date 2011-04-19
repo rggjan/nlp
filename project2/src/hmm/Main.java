@@ -1,6 +1,7 @@
 package hmm;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -11,7 +12,12 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		TextParser parser = new TextParser();
 		parser.readText("data/train_1.pos");
-		parser.readTags();
+		TagCollection collection = parser.readTags();
+		
+		parser = new TextParser();
+		parser.readText("data/test_1.pos");
+		ArrayList<ArrayList<String>> sentenceList = parser.readSentences(); 
+		System.out.println(sentenceList);
 	}
 
 }

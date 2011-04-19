@@ -24,7 +24,7 @@ public class TextParser {
 		String line;
 		line = br.readLine();
 		while (line != null) {
-			if (line.trim().length() > 0) {
+			if (!line.equals("==================================")) {
 				sentence.append(" " + line);
 			} else {
 				rawText.add(sentence.toString());
@@ -34,7 +34,28 @@ public class TextParser {
 		}
 	}
 	
-	public void readTags() {
+	public ArrayList<ArrayList<String>> readSentences() {
+		ArrayList<ArrayList<String>> sentenceList = new ArrayList<ArrayList<String>>();
+		
+		for (String sentence : rawText) {
+			ArrayList<String> wordlist = new ArrayList<String>();
+			
+			for (String word : sentence.split(" ")) {
+				if (word.matches("[A-Za-z-]+/[A-Z$]+")) {
+					String[] splitting = word.split("/");
+					wordlist.add(splitting[0]);
+				}
+			}
+			
+			// Check if whole sentence had words
+			if (wordlist.size() > 0)
+				sentenceList.add(wordlist);
+		}
+		
+		return sentenceList;
+	}
+	
+	public TagCollection readTags() {
 		tagCollection = new TagCollection();
 		
 		for (String sentence : rawText) {
@@ -52,5 +73,7 @@ public class TextParser {
 			if (previous_tag.length() > 0)
 				tagCollection.addFinalTag(previous_tag);
 		}
+		
+		return tagCollection;
 	}
 }
