@@ -10,16 +10,25 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		final boolean simple_texts = true;		
+		
 		TextParser parser = new TextParser();
-		/*for (int i=1; i<4; i++)
-			parser.readText("data/train_" + i + ".pos");*/
-		parser.readText("data/train.txt");
+		
+		if (simple_texts) {
+			parser.readText("data/train.txt");	
+		} else {
+			for (int i=1; i<4; i++)
+				parser.readText("data/train_" + i + ".pos");
+		}
 		
 		TagCollection collection = parser.readTags();
 		
 		parser = new TextParser();
-		//parser.readText("data/test_1.pos");
-		parser.readText("data/test.txt");
+		if (simple_texts) {
+			parser.readText("data/test.txt");
+		} else {
+			parser.readText("data/test_1.pos");
+		}
 		ArrayList<ArrayList<String>> sentenceList = parser.readSentences();
 		
 		for (ArrayList<String> sentence : sentenceList) {

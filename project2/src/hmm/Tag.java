@@ -4,16 +4,16 @@ import java.util.HashMap;
 
 public class Tag {
 	private HashMap<String, Integer> wordCount;
-	private HashMap<Tag, Integer> tagCount;
+	private HashMap<String, Integer> tagCount;
 	
 	private int numWords = 0;
 	private int numTags;
 	
-	private String name;
+	String name;
 
 	public Tag(String name_) {
 		wordCount = new HashMap<String, Integer>();
-		tagCount = new HashMap<Tag, Integer>();
+		tagCount = new HashMap<String, Integer>();
 		
 		name = name_;
 	}
@@ -29,20 +29,20 @@ public class Tag {
 		numWords++;
 	}
 
-	public String toString() {
-		return "Tag(" + name + ")"; 
-	}
-	
 	// Add next tag, null is final tag
-	public void addNextTag(Tag tag) {
+	public void addNextTag(String tag) {
 		// Laplace, renormalization
 		if (!tagCount.containsKey(tag)) {
-			tagCount.put(tag, 0);
+			tagCount.put(tag, 1);
 			numTags++;
 		}
 
-		tagCount.put(tag, tagCount.get(tag));
+		tagCount.put(tag, tagCount.get(tag) + 1);
 		numTags++;
+	}
+	
+	public String toString() {
+		return "Tag(" + name + ")"; 
 	}
 
 	public double wordProbability(String word) {
@@ -52,7 +52,18 @@ public class Tag {
 		else
 			result = 1.0;
 		
-		System.out.println(name + " => " + word + ", " + result + "/" + numWords);
+		//System.out.println(name + " => " + word + ", " + result + "/" + numWords);
 		return result / numWords;
+	}
+
+	public double nextTagProbability(String tag) {
+		double result;
+		if (tagCount.containsKey(tag))
+			result = tagCount.get(tag);
+		else
+			result = 1.0;
+		
+		//System.out.println(name + " => " + tag + ", " + result + "/" + numTags);
+		return result / numTags;
 	}
 }

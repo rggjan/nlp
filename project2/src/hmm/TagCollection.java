@@ -36,7 +36,7 @@ public class TagCollection {
 		}
 		
 		tag2.addWord(word);
-		tag1.addNextTag(tag2);
+		tag1.addNextTag(tag2.name);
 	}
 
 	public void addFinalTag(String previousTag) {
@@ -51,9 +51,17 @@ public class TagCollection {
 			String[] splitting = wordPair.split("/");
 			String word = splitting[0];
 			String tag = splitting[1];
+
+			// Multiply with tag-to-tag probability
+			probability *= tagTable.get(old_tag).nextTagProbability(tag);
+			// Multiply with tag-to-word probability
+			probability *= tagTable.get(tag).wordProbability(word);
 			
-			probability *= tagTable.get(tag).wordProbability(word); 
+			old_tag = tag;
 		}
+		
+		// Multiply with final-tag probability
+		probability *= tagTable.get(old_tag).nextTagProbability(null);
 		return probability;
 	}
 }
