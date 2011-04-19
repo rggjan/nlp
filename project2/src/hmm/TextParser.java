@@ -43,7 +43,7 @@ public class TextParser {
 			for (String word : sentence.split(" ")) {
 				if (word.matches("[A-Za-z-]+/[A-Z$]+")) {
 					String[] splitting = word.split("/");
-					wordlist.add(splitting[0]);
+					wordlist.add(splitting[0].toLowerCase());
 				}
 			}
 			

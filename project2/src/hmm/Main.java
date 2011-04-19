@@ -16,8 +16,16 @@ public class Main {
 		
 		parser = new TextParser();
 		parser.readText("data/test_1.pos");
-		ArrayList<ArrayList<String>> sentenceList = parser.readSentences(); 
-		System.out.println(sentenceList);
+		ArrayList<ArrayList<String>> sentenceList = parser.readSentences();
+		
+		for (ArrayList<String> sentence : sentenceList) {
+			System.out.println("===================");
+			for (String word : sentence) {
+				System.out.print(word + " ");
+			}
+			System.out.println();
+		}
+		
 	}
 
 }
