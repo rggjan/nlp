@@ -14,7 +14,7 @@ public class TextParser {
 		rawText = new ArrayList<String>();
 	}
 
-	public void readText(String filename) throws IOException {
+	public void readText(String filename) throws IOException {		
 		BufferedReader br;
 		StringBuffer sentence = new StringBuffer();
 
@@ -24,7 +24,8 @@ public class TextParser {
 		String line;
 		line = br.readLine();
 		while (line != null) {
-			if (!line.equals("==================================")) {
+			line = line.toLowerCase();
+			if (!line.matches("========+")) {
 				sentence.append(" " + line);
 			} else {
 				rawText.add(sentence.toString());
@@ -35,15 +36,16 @@ public class TextParser {
 	}
 	
 	public ArrayList<ArrayList<String>> readSentences() {
+
 		ArrayList<ArrayList<String>> sentenceList = new ArrayList<ArrayList<String>>();
 		
 		for (String sentence : rawText) {
 			ArrayList<String> wordlist = new ArrayList<String>();
 			
 			for (String word : sentence.split(" ")) {
-				if (word.matches("[A-Za-z-]+/[A-Z$]+")) {
-					String[] splitting = word.split("/");
-					wordlist.add(splitting[0].toLowerCase());
+				if (word.matches("[a-z-]+/[a-z$]+")) {
+					//String[] splitting = word.split("/");
+					wordlist.add(word);
 				}
 			}
 			
@@ -62,7 +64,7 @@ public class TextParser {
 			String previous_tag = "";
 			
 			for (String word : sentence.split(" ")) {
-				if (word.matches("[A-Za-z-]+/[A-Z$]+")) {
+				if (word.matches("[a-z-]+/[a-z$]+")) {
 					String[] splitting = word.split("/");
 					tagCollection.addTag(splitting[0], splitting[1], previous_tag);
 					previous_tag = splitting[1];

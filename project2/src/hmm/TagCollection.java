@@ -1,5 +1,6 @@
 package hmm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TagCollection {
@@ -20,7 +21,7 @@ public class TagCollection {
 		
 		// Load tag 1
 		if (!tagTable.containsKey(previousTagString)) {
-			tag1 = new Tag();
+			tag1 = new Tag(previousTagString);
 			tagTable.put(previousTagString, tag1);
 		} else {
 			tag1 = tagTable.get(previousTagString);
@@ -28,7 +29,7 @@ public class TagCollection {
 		
 		// Load tag 2
 		if (!tagTable.containsKey(tagString)) {
-			tag2 = new Tag();
+			tag2 = new Tag(tagString);
 			tagTable.put(tagString, tag2);
 		} else {
 			tag2 = tagTable.get(tagString);
@@ -40,5 +41,19 @@ public class TagCollection {
 
 	public void addFinalTag(String previousTag) {
 		tagTable.get(previousTag).addNextTag(null);
+	}
+
+	public double predictWithTags(ArrayList<String> sentence) {
+		double probability = 1;
+		String old_tag = "";
+		
+		for (String wordPair : sentence) {
+			String[] splitting = wordPair.split("/");
+			String word = splitting[0];
+			String tag = splitting[1];
+			
+			probability *= tagTable.get(tag).wordProbability(word); 
+		}
+		return probability;
 	}
 }
