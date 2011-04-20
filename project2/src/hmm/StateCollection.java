@@ -121,6 +121,7 @@ public class StateCollection {
 	
 			result.add(getMaxState(new_probabilities));
 			probabilities = new_probabilities;
+			new_probabilities = new HashMap<String, Double>();
 		}
 		
 		return result;
