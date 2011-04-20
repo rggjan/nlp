@@ -79,6 +79,16 @@ public class StateCollection {
 		return probability;
 	}
 	
+	class Pair {
+		public String second;
+		public double first;
+
+		Pair(double first_, String second_) {
+			first = first_;
+			second = second_;
+		}
+	}
+	
 	public ArrayList<String> calculateStatesofSentence(
 			ArrayList<String> sentence) {
 		ArrayList<String> result = new ArrayList<String>();
@@ -95,10 +105,9 @@ public class StateCollection {
 			
 			probabilities.put(state, value);
 		}
-		result.add(getMaxState(probabilities));
 		
 		// Calculate all other probabilities
-		HashMap<String, Double> new_probabilities = new HashMap<String, Double>();
+		HashMap<String, StateCollection.Pair> new_probabilities = new HashMap<String, StateCollection.Pair>();
 		
 		for (int i=1; i<sentence.size(); i++) {			
 			splitting = sentence.get(i).split("/");
@@ -106,20 +115,27 @@ public class StateCollection {
 			
 			for (String state : state_names) {
 				double max_value = 0;
+				String best_previous_state = "";
 				
 				for (String previous_state : state_names) {
 					double value = probabilities.get(previous_state);
 					value *= states.get(previous_state).nextStateProbability(state);
 					value *= states.get(state).wordEmittingProbability(word);
 	
-					if (value > max_value)
+					if (value > max_value) {
 						max_value = value;
+						best_previous_state = previous_state;
+					}
 				}
 				
-				new_probabilities.put(state, max_value);
+				new_probabilities.put(state, new Pair(max_value, best_previous_state));
 			}
 	
-			result.add(getMaxState(new_probabilities));
+			String best_state = getMaxState(new_probabilities);
+			
+			// We need the state that got us here, to add it to the result
+			result.add("C");
+			
 			probabilities = new_probabilities;
 			new_probabilities = new HashMap<String, Double>();
 		}
