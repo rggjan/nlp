@@ -90,15 +90,38 @@ public class StateCollection {
 		
 		// Calculate starting probabilities
 		for (String state : state_names) {
-			double value = 0;
-			
-			value = states.get("").nextStateProbability(state);
+			double value = states.get("").nextStateProbability(state);
 			value *= states.get(state).wordEmittingProbability(first_word);
 			
 			probabilities.put(state, value);
 		}
-		
 		result.add(getMaxState(probabilities));
+		
+		// Calculate all other probabilities
+		HashMap<String, Double> new_probabilities = new HashMap<String, Double>();
+		
+		for (int i=1; i<sentence.size(); i++) {
+			splitting = sentence.get(1).split("/");
+			String word = splitting[0];
+			
+			for (String state : state_names) {
+				double max_value = 0;
+				
+				for (String previous_state : state_names) {
+					double value = probabilities.get(previous_state);
+					value *= states.get(previous_state).nextStateProbability(state);
+					value *= states.get(state).wordEmittingProbability(word);
+	
+					if (value > max_value)
+						max_value = value;
+				}
+				
+				new_probabilities.put(state, max_value);
+			}
+	
+			result.add(getMaxState(new_probabilities));
+			probabilities = new_probabilities;
+		}
 		
 		return result;
 	}

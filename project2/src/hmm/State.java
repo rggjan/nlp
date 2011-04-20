@@ -47,7 +47,7 @@ public class State {
 	}
 	
 	public String toString() {
-		return "State(" + name + ")"; 
+		return "State(" + name + ")" + emittedWordCounts.toString(); 
 	}
 
 	public double wordEmittingProbability(String word) {
