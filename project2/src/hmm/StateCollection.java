@@ -100,8 +100,8 @@ public class StateCollection {
 		// Calculate all other probabilities
 		HashMap<String, Double> new_probabilities = new HashMap<String, Double>();
 		
-		for (int i=1; i<sentence.size(); i++) {
-			splitting = sentence.get(1).split("/");
+		for (int i=1; i<sentence.size(); i++) {			
+			splitting = sentence.get(i).split("/");
 			String word = splitting[0];
 			
 			for (String state : state_names) {
