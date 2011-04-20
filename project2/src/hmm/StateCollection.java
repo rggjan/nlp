@@ -48,7 +48,7 @@ public class StateCollection {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public double calculateProbabilityofSentenceWithTags(ArrayList<String> sentence) {
+	public double calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
 		double probability = 1;
 		String old_tag = "";
 		
@@ -58,7 +58,7 @@ public class StateCollection {
 			String tag = splitting[1];
 
 			// Multiply with tag-to-tag probability
-			probability *= states.get(old_tag).nextTagProbability(tag);
+			probability *= states.get(old_tag).nextStateProbability(tag);
 			// Multiply with tag-to-word probability
 			probability *= states.get(tag).wordEmittingProbability(word);
 			
@@ -66,7 +66,29 @@ public class StateCollection {
 		}
 		
 		// Multiply with final-tag probability
-		probability *= states.get(old_tag).nextTagProbability(null);
+		probability *= states.get(old_tag).nextStateProbability(null);
+		return probability;
+	}
+	
+	public double calculateStatesofSentence(ArrayList<String> sentence) {
+		double probability = 1;
+		String old_tag = "";
+		
+		for (String wordPair : sentence) {
+			String[] splitting = wordPair.split("/");
+			String word = splitting[0];
+			String tag = splitting[1];
+
+			// Multiply with tag-to-tag probability
+			probability *= states.get(old_tag).nextStateProbability(tag);
+			// Multiply with tag-to-word probability
+			probability *= states.get(tag).wordEmittingProbability(word);
+			
+			old_tag = tag;
+		}
+		
+		// Multiply with final-tag probability
+		probability *= states.get(old_tag).nextStateProbability(null);
 		return probability;
 	}
 }

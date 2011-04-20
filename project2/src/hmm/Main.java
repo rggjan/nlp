@@ -34,7 +34,7 @@ public class Main {
 		}
 		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 		
-		// iterate ofer the test text and print the probatilities of
+		// iterate over the test text and print the probabilities of
 		// the test sentences
 		for (ArrayList<String> sentence : sentenceList) {
 			System.out.println("===================");
@@ -43,7 +43,7 @@ public class Main {
 			}
 			System.out.println();
 
-			System.out.println("=> " + collection.calculateProbabilityofSentenceWithTags(sentence));
+			System.out.println("=> " + collection.calculateProbabilityofSentenceWithStates(sentence));
 		}
 	}
 
