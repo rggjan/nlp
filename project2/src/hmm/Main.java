@@ -10,7 +10,7 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = false;		
+		final boolean simple_texts = true;		
 		
 		TextParser parser = new TextParser();
 		
@@ -43,7 +43,9 @@ public class Main {
 			}
 			System.out.println();
 
+			System.out.println(collection.calculateStatesofSentence(sentence));
 			System.out.println("=> " + collection.calculateProbabilityofSentenceWithStates(sentence));
+
 		}
 	}
 
