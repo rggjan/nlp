@@ -76,7 +76,7 @@ public class TextParser {
 		StateCollection tagCollection = new StateCollection();
 		
 		for (String sentence : rawSentences) {
-			String previous_tag = "";
+			String previous_tag = tagCollection.startState().name;
 			
 			for (String word : sentence.split(" ")) {
 				if (word.matches("[a-z-]+/[a-z$]+")) {

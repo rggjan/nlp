@@ -8,72 +8,90 @@ import java.util.HashMap;
  *
  */
 public class State {
-	private HashMap<String, Integer> emittedWordCounts;
-	private HashMap<String, Integer> nextStateCounts;
-	
-	private int numWords = 0;
-	private int numStates =0;
-	
+	private HashMap<Word, Integer> emittedWordCounts=new HashMap<Word, Integer>();
+	private HashMap<State, Integer> nextStateCounts=new HashMap<State, Integer>();
+	StateCollection stateCollection;
 	String name;
 
-	public State(String name_) {
-		emittedWordCounts = new HashMap<String, Integer>();
-		nextStateCounts = new HashMap<String, Integer>();
-		
+	public State(String name_, StateCollection _stateCollection) {
 		name = name_;
+		stateCollection=_stateCollection;
 	}
 
-	public void addWordEmissionObservation(String word) {
+	public void addWordEmissionObservation(Word word) {
 		// Laplace, renormalization
 		if (!emittedWordCounts.containsKey(word)) {
 			emittedWordCounts.put(word, 1);
-			numWords++;
 		}
-		
-		emittedWordCounts.put(word, emittedWordCounts.get(word) + 1);
-		numWords++;
+		else{
+			emittedWordCounts.put(word, emittedWordCounts.get(word) + 1);
+		}
 	}
 
 	// Add next State, null is final State
-	public void addStateTransitionObservation(String nextState) {
+	public void addStateTransitionObservation(State nextState) {
 		// Laplace, renormalization
 		if (!nextStateCounts.containsKey(nextState)) {
 			nextStateCounts.put(nextState, 1);
-			numStates++;
 		}
-
-		nextStateCounts.put(nextState, nextStateCounts.get(nextState) + 1);
-		numStates++;
+		else{
+			nextStateCounts.put(nextState, nextStateCounts.get(nextState) + 1);
+		}
 	}
 	
 	public String toString() {
 		return "State(" + name + ")"; 
 	}
 
-	public String getDisplayName(){
-		if (name==null) return "<null>";
-		if (name.equals("")) return "<_>";
-		return name;
-	}
-	public double wordEmittingProbability(String word) {
-		double wordCount;
+	/**
+	 * count how many times a given word has been emitted
+	 * @param word
+	 * @return
+	 */
+	public int wordCount(Word word){
+		int result=1;
 		if (emittedWordCounts.containsKey(word))
-			wordCount = emittedWordCounts.get(word);
-		else
-			wordCount = 1.0;
-		
-		//System.out.println(name + " => " + word + ", " + result + "/" + numWords);
-		return wordCount / numWords;
+			result+=emittedWordCounts.get(word);
+		return result;
+	}
+	
+	/**
+	 * caclulate the count of all emitted words
+	 * @return
+	 */
+	public int totalWordCount(){
+		int result=0;
+		// iterate over all words ever seen, to get numbers useful for a true
+		// probability
+		for (Word w: stateCollection.words.values()){
+			result+=wordCount(w);
+		}
+		return result;
+	}
+	
+	public int nextStateCount(State state){
+		int result=1;
+		if (nextStateCounts.containsKey(state)){
+			result+=nextStateCounts.get(state);
+		}
+		return result;
+	}
+	
+	public int totalNextStateCount(){
+		int result=0;
+		// iterate over all states, to get numbers useful for a true
+		// probability
+		for (State s: stateCollection.states.values()){
+			result+=nextStateCount(s);
+		}
+		return result;
+	}
+	
+	public double wordEmittingProbability(Word word) {
+		return (double) wordCount(word)/(double)totalWordCount();
 	}
 
-	public double nextStateProbability(String state) {
-		double result;
-		if (nextStateCounts.containsKey(state))
-			result = nextStateCounts.get(state);
-		else
-			result = 1.0;
-		
-		//System.out.println(name + " => " + State + ", " + result + "/" + numStates);
-		return result / numStates;
+	public double nextStateProbability(State state) {
+		return (double) nextStateCount(state)/(double)totalNextStateCount();
 	}
 }

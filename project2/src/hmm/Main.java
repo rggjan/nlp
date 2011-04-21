@@ -63,7 +63,7 @@ public class Main {
 			Viterbi viterbi=Viterbi.viterbi(collection, notTagSentence);
 			
 			for (int i=0; i<notTagSentence.size(); i++){
-				System.out.printf("%s/%s ",notTagSentence.get(i),viterbi.getStates().get(i));
+				System.out.printf("%s/%s ",notTagSentence.get(i),viterbi.getStates().get(i).name);
 			}
 			System.out.println();
 

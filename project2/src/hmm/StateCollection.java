@@ -9,42 +9,96 @@ import java.util.HashSet;
 
 public class StateCollection {
 	
-	public HashMap<String, State> states;
+	public HashMap<String, State> states=new HashMap<String, State>();
+	public HashMap<String, Word> words=new HashMap<String, Word>();
 	
-	public State startTag() {
-		return states.get("");
+	private State getStateTraining(String s){
+		if (s==null || s.equals(""))
+			throw new Error("invalid state name");
+		
+		// return existing state if available
+		if (states.containsKey(s)){
+			return states.get(s);
+		}
+		
+		// create new state
+		State result=new State(s,this);
+		states.put(s,result);
+		return result;
+	}
+	
+	public State getState(String s){
+		// return existing state if available
+		if (states.containsKey(s)){
+			return states.get(s);
+		}
+		
+		return unknownState();
+	}
+	
+	private Word getWordTraining(String s){
+		// return existing word if available
+		if (words.containsKey(s)){
+			return words.get(s);
+		}
+		
+		// create new word
+		Word result=new Word(s);
+		words.put(s,result);
+		return result;
+	}
+	
+	
+	public Word getWord(String s){
+		// return existing word if available
+		if (words.containsKey(s)){
+			return words.get(s);
+		}
+		
+		return unknownWord();
+	}
+	
+	public State startState() {
+		return getStateTraining("<start>");
+	}
+	
+	public State endState() {
+		return getStateTraining("<end>");
+	}
+	
+	public State unknownState() {
+		return getStateTraining("<unk>");
+	}
+	
+	public Word unknownWord(){
+		return getWordTraining("<unk>");
 	}
 	
 	public StateCollection() {
-		states = new HashMap<String, State>();
+		// crate start and end state
+		startState();
+		endState();
+		unknownState();
 	}
 
-	public void addStateTansitionObservation(String word, String stateString, String previousStateString) {
+	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {
 		State previousState;
 		State state;
+		Word word;
 		
-		// load previous state
-		if (!states.containsKey(previousStateString)) {
-			previousState = new State(previousStateString);
-			states.put(previousStateString, previousState);
-		} else {
-			previousState = states.get(previousStateString);
-		}
+		// load states
+		previousState = getStateTraining(previousStateString);
+		state = getStateTraining(stateString);
 		
-		// load current state
-		if (!states.containsKey(stateString)) {
-			state = new State(stateString);
-			states.put(stateString, state);
-		} else {
-			state = states.get(stateString);
-		}
+		// load word
+		word=getWordTraining(wordString);
 		
 		state.addWordEmissionObservation(word);
-		previousState.addStateTransitionObservation(state.name);
+		previousState.addStateTransitionObservation(state);
 	}
 
 	public void addFinalStateTransitionObservation(String previousState) {
-		states.get(previousState).addStateTransitionObservation(null);
+		getStateTraining(previousState).addStateTransitionObservation(endState());
 	}
 
 	/**
@@ -52,45 +106,66 @@ public class StateCollection {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public double calculateProbabilityofSentenceWithStates(
-			ArrayList<String> sentence) {
+	public double calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
 		double probability = 1;
-		String old_tag = "";
+		State lastState = startState();
 		
 		for (String wordPair : sentence) {
 			String[] splitting = wordPair.split("/");
-			String word = splitting[0];
-			String tag = splitting[1];
+			String wordString = splitting[0];
+			String stateString = splitting[1];
 
-			// Multiply with tag-to-tag probability
-			probability *= states.get(old_tag).nextStateProbability(tag);
-			// Multiply with tag-to-word probability
-			probability *= states.get(tag).wordEmittingProbability(word);
+			Word word=getWord(wordString);
+			State state=getState(stateString);
 			
-			old_tag = tag;
+			// Multiply with tag-to-tag probability
+			probability *= lastState.nextStateProbability(state);
+			// Multiply with tag-to-word probability
+			probability *= state.wordEmittingProbability(word);
+			
+			lastState = state;
 		}
 		
 		// Multiply with final-tag probability
-		probability *= states.get(old_tag).nextStateProbability(null);
+		probability *= lastState.nextStateProbability(unknownState());
 		return probability;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder builder=new StringBuilder();
+		
+		// print transition matrix
 		builder.append(String.format("\t"));
 		for (State column: states.values()){
-			builder.append(String.format("%s\t",column.getDisplayName()));
+			builder.append(String.format("%s\t",column.name));
 		}
 		builder.append(String.format("\n"));
 		
 		for (State row: states.values()){
-			builder.append(String.format("%s\t",row.getDisplayName()));
+			builder.append(String.format("%s\t",row.name));
 			for (State column: states.values()){
-				builder.append(String.format("%.2f\t",row.nextStateProbability(column.getDisplayName())));
+				builder.append(String.format("%.2f\t",row.nextStateProbability(column)));
 			}
 			builder.append(String.format("\n"));
 		}
+		builder.append(String.format("\n"));
+		
+		// print emission matrix
+		builder.append(String.format("\t"));
+		for (Word column: words.values()){
+			builder.append(String.format("%s\t",column.name));
+		}
+		builder.append(String.format("\n"));
+		
+		for (State row: states.values()){
+			builder.append(String.format("%s\t",row.name));
+			for (Word column: words.values()){
+				builder.append(String.format("%.2f\t",row.wordEmittingProbability(column)));
+			}
+			builder.append(String.format("\n"));
+		}
+		
 		return builder.toString();
 	}
 }
