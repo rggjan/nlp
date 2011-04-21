@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class TextParser {
 	ArrayList<String> rawSentences;
-	StateCollection tagCollection;
+	
 	
 	public TextParser() {
 		rawSentences = new ArrayList<String>();
@@ -73,7 +73,7 @@ public class TextParser {
 	 * @return
 	 */
 	public StateCollection getStateCollection() {
-		tagCollection = new StateCollection();
+		StateCollection tagCollection = new StateCollection();
 		
 		for (String sentence : rawSentences) {
 			String previous_tag = "";

@@ -1,11 +1,14 @@
 package hmm;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StateCollection {
 	
-	HashMap<String, State> states;
+	public HashMap<String, State> states;
 	
 	public State startTag() {
 		return states.get("");
@@ -68,5 +71,24 @@ public class StateCollection {
 		// Multiply with final-tag probability
 		probability *= states.get(old_tag).nextTagProbability(null);
 		return probability;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder=new StringBuilder();
+		builder.append(String.format("\t"));
+		for (State column: states.values()){
+			builder.append(String.format("%s\t",column.getDisplayName()));
+		}
+		builder.append(String.format("\n"));
+		
+		for (State row: states.values()){
+			builder.append(String.format("%s\t",row.getDisplayName()));
+			for (State column: states.values()){
+				builder.append(String.format("%.2f\t",row.nextTagProbability(column.getDisplayName())));
+			}
+			builder.append(String.format("\n"));
+		}
+		return builder.toString();
 	}
 }

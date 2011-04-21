@@ -10,7 +10,7 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = false;		
+		final boolean simple_texts = true;		
 		
 		TextParser parser = new TextParser();
 		
@@ -24,6 +24,7 @@ public class Main {
 		
 		// get the state collection ( trained HMM)
 		StateCollection collection = parser.getStateCollection();
+		System.out.print(collection);
 		
 		// read the test text
 		parser = new TextParser();
@@ -34,7 +35,7 @@ public class Main {
 		}
 		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 		
-		// iterate ofer the test text and print the probatilities of
+		// iterate over the test text and print the probatilities of
 		// the test sentences
 		for (ArrayList<String> sentence : sentenceList) {
 			System.out.println("===================");
@@ -44,6 +45,29 @@ public class Main {
 			System.out.println();
 
 			System.out.println("=> " + collection.calculateProbabilityofSentenceWithTags(sentence));
+		}
+		
+		// iterate over the test text and print the best tagging,
+		// along with the probability
+		for (ArrayList<String> sentence : sentenceList) {
+			System.out.println("===================");
+			ArrayList<String> notTagSentence=new ArrayList<String>();
+			
+			for (String word : sentence) {
+				String s=word.split("/")[0];
+				System.out.print(s + " ");
+				notTagSentence.add(s);
+			}
+			System.out.println();
+
+			Viterbi viterbi=Viterbi.viterbi(collection, notTagSentence);
+			
+			for (int i=0; i<notTagSentence.size(); i++){
+				System.out.printf("%s/%s ",notTagSentence.get(i),viterbi.getStates().get(i));
+			}
+			System.out.println();
+
+			System.out.println("=> " + viterbi.getProbability());
 		}
 	}
 

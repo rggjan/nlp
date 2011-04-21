@@ -12,7 +12,7 @@ public class State {
 	private HashMap<String, Integer> nextTagCounts;
 	
 	private int numWords = 0;
-	private int numTags;
+	private int numTags =0;
 	
 	String name;
 
@@ -47,9 +47,14 @@ public class State {
 	}
 	
 	public String toString() {
-		return "Tag(" + name + ")"; 
+		return "State(" + name + ")"; 
 	}
 
+	public String getDisplayName(){
+		if (name==null) return "<null>";
+		if (name.equals("")) return "<_>";
+		return name;
+	}
 	public double wordEmittingProbability(String word) {
 		double wordCount;
 		if (emittedWordCounts.containsKey(word))
