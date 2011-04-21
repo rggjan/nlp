@@ -22,7 +22,7 @@ public class Viterbi {
 		for (State prevState:  hmm.states.values()){
 			if (prevState.name==null || prevState.name.equals("")) continue;
 			double f=	v.get(output.size()-1, prevState.name)
-				*prevState.nextTagProbability(null);
+				*prevState.nextStateProbability(null);
 			if (f>probability) {
 				probability=f;
 				bestLast=prevState;
@@ -56,7 +56,7 @@ public class Viterbi {
 					if (prevState.name==null || prevState.name.equals("")) continue;
 					double f=
 						v.get(t-1, prevState.name)
-						*prevState.nextTagProbability(state)
+						*prevState.nextStateProbability(state)
 						*hmm.states.get(state).wordEmittingProbability(output.get(t));
 					if (f>result) {
 						result=f;
@@ -77,7 +77,7 @@ public class Viterbi {
 			public Double evaluate(Integer t, String state) {
 				if (t==0){
 					return 
-						hmm.states.get("").nextTagProbability(state)
+						hmm.states.get("").nextStateProbability(state)
 						*hmm.states.get(state).wordEmittingProbability(output.get(t));
 				}
 				double result=0;
@@ -85,7 +85,7 @@ public class Viterbi {
 					if (prevState.name==null || prevState.name.equals("")) continue;
 					double f=
 						v.get(t-1, prevState.name)
-						*prevState.nextTagProbability(state)
+						*prevState.nextStateProbability(state)
 						*hmm.states.get(state).wordEmittingProbability(output.get(t));
 					if (f>result) result=f;
 				}

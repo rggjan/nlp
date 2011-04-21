@@ -9,16 +9,16 @@ import java.util.HashMap;
  */
 public class State {
 	private HashMap<String, Integer> emittedWordCounts;
-	private HashMap<String, Integer> nextTagCounts;
+	private HashMap<String, Integer> nextStateCounts;
 	
 	private int numWords = 0;
-	private int numTags =0;
+	private int numStates =0;
 	
 	String name;
 
 	public State(String name_) {
 		emittedWordCounts = new HashMap<String, Integer>();
-		nextTagCounts = new HashMap<String, Integer>();
+		nextStateCounts = new HashMap<String, Integer>();
 		
 		name = name_;
 	}
@@ -34,16 +34,16 @@ public class State {
 		numWords++;
 	}
 
-	// Add next tag, null is final tag
+	// Add next State, null is final State
 	public void addStateTransitionObservation(String nextState) {
 		// Laplace, renormalization
-		if (!nextTagCounts.containsKey(nextState)) {
-			nextTagCounts.put(nextState, 1);
-			numTags++;
+		if (!nextStateCounts.containsKey(nextState)) {
+			nextStateCounts.put(nextState, 1);
+			numStates++;
 		}
 
-		nextTagCounts.put(nextState, nextTagCounts.get(nextState) + 1);
-		numTags++;
+		nextStateCounts.put(nextState, nextStateCounts.get(nextState) + 1);
+		numStates++;
 	}
 	
 	public String toString() {
@@ -66,14 +66,14 @@ public class State {
 		return wordCount / numWords;
 	}
 
-	public double nextTagProbability(String tag) {
+	public double nextStateProbability(String state) {
 		double result;
-		if (nextTagCounts.containsKey(tag))
-			result = nextTagCounts.get(tag);
+		if (nextStateCounts.containsKey(state))
+			result = nextStateCounts.get(state);
 		else
 			result = 1.0;
 		
-		//System.out.println(name + " => " + tag + ", " + result + "/" + numTags);
-		return result / numTags;
+		//System.out.println(name + " => " + State + ", " + result + "/" + numStates);
+		return result / numStates;
 	}
 }

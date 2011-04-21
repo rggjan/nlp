@@ -44,7 +44,7 @@ public class Main {
 			}
 			System.out.println();
 
-			System.out.println("=> " + collection.calculateProbabilityofSentenceWithTags(sentence));
+			System.out.println("=> " + collection.calculateProbabilityofSentenceWithStates(sentence));
 		}
 		
 		// iterate over the test text and print the best tagging,

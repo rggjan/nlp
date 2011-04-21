@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class StateCollection {
 	
@@ -51,7 +52,8 @@ public class StateCollection {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public double calculateProbabilityofSentenceWithTags(ArrayList<String> sentence) {
+	public double calculateProbabilityofSentenceWithStates(
+			ArrayList<String> sentence) {
 		double probability = 1;
 		String old_tag = "";
 		
@@ -61,7 +63,7 @@ public class StateCollection {
 			String tag = splitting[1];
 
 			// Multiply with tag-to-tag probability
-			probability *= states.get(old_tag).nextTagProbability(tag);
+			probability *= states.get(old_tag).nextStateProbability(tag);
 			// Multiply with tag-to-word probability
 			probability *= states.get(tag).wordEmittingProbability(word);
 			
@@ -69,7 +71,7 @@ public class StateCollection {
 		}
 		
 		// Multiply with final-tag probability
-		probability *= states.get(old_tag).nextTagProbability(null);
+		probability *= states.get(old_tag).nextStateProbability(null);
 		return probability;
 	}
 	
@@ -85,7 +87,7 @@ public class StateCollection {
 		for (State row: states.values()){
 			builder.append(String.format("%s\t",row.getDisplayName()));
 			for (State column: states.values()){
-				builder.append(String.format("%.2f\t",row.nextTagProbability(column.getDisplayName())));
+				builder.append(String.format("%.2f\t",row.nextStateProbability(column.getDisplayName())));
 			}
 			builder.append(String.format("\n"));
 		}
