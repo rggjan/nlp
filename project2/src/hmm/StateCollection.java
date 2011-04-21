@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 public class StateCollection {
 	
+	private boolean isFrozen;
 	public HashMap<String, State> states=new HashMap<String, State>();
 	public HashMap<String, Word> words=new HashMap<String, Word>();
 	
@@ -82,6 +83,7 @@ public class StateCollection {
 	}
 
 	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {
+		if (isFrozen()) throw new Error();
 		State previousState;
 		State state;
 		Word word;
@@ -98,6 +100,7 @@ public class StateCollection {
 	}
 
 	public void addFinalStateTransitionObservation(String previousState) {
+		if (isFrozen()) throw new Error();
 		getStateTraining(previousState).addStateTransitionObservation(endState());
 	}
 
@@ -167,5 +170,13 @@ public class StateCollection {
 		}
 		
 		return builder.toString();
+	}
+
+	public void freeze() {
+		this.isFrozen = true;
+	}
+
+	public boolean isFrozen() {
+		return isFrozen;
 	}
 }

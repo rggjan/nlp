@@ -10,7 +10,7 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = true;		
+		final boolean simple_texts = false;		
 		
 		TextParser parser = new TextParser();
 		
@@ -24,7 +24,7 @@ public class Main {
 		
 		// get the state collection ( trained HMM)
 		StateCollection collection = parser.getStateCollection();
-		System.out.print(collection);
+		//System.out.print(collection);
 		
 		// read the test text
 		parser = new TextParser();

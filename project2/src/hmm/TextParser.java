@@ -91,6 +91,7 @@ public class TextParser {
 				tagCollection.addFinalStateTransitionObservation(previous_tag);
 		}
 		
+		tagCollection.freeze();
 		return tagCollection;
 	}
 }

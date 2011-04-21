@@ -55,17 +55,21 @@ public class State {
 		return result;
 	}
 	
+	private int totalWordCountCache=-1;
 	/**
 	 * caclulate the count of all emitted words
 	 * @return
 	 */
 	public int totalWordCount(){
+		if (stateCollection.isFrozen() && totalWordCountCache!=-1) return totalWordCountCache;
 		int result=0;
 		// iterate over all words ever seen, to get numbers useful for a true
 		// probability
 		for (Word w: stateCollection.words.values()){
 			result+=wordCount(w);
 		}
+		
+		if (stateCollection.isFrozen()) totalWordCountCache=result;
 		return result;
 	}
 	
@@ -77,13 +81,18 @@ public class State {
 		return result;
 	}
 	
+	private int totalNextStateCountCache=-1;
 	public int totalNextStateCount(){
+		if (stateCollection.isFrozen()&&totalNextStateCountCache!=-1) return totalNextStateCountCache;
+		
 		int result=0;
 		// iterate over all states, to get numbers useful for a true
 		// probability
 		for (State s: stateCollection.states.values()){
 			result+=nextStateCount(s);
 		}
+		
+		if (stateCollection.isFrozen()) totalNextStateCountCache=result;
 		return result;
 	}
 	
