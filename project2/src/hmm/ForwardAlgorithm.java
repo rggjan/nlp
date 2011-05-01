@@ -39,7 +39,7 @@ public class ForwardAlgorithm {
 	}
 	
 	// Get the probability for a certain element at a certain index
-	public double getV(int index, State qj) {
+	public double getAlpha(int index, State qj) {
 		assert(index >= 1);
 		assert(index-1 < outputSencence.size()); 
 		
@@ -56,20 +56,18 @@ public class ForwardAlgorithm {
 			return probability;			
 		}
 		
-		double max = 0;
+		double sum = 0;
 		//double argmax = 1;
 		
 		for (State qi : stateCollection.states.values()) {
 			double value;
-			value = getV(index - 1, qj);
+			value = getAlpha(index - 1, qj);
 			value *= qi.nextStateProbability(qj);
 			value *= qj.wordEmittingProbability(new Word(outputSencence.get(index - 1)));
-			if (value > max) {
-				max = value;
-			}
+			sum += value;
 		}
 		
-		addToCache(index, qj, max);
-		return max;
+		addToCache(index, qj, sum);
+		return sum;
 	}
 }
