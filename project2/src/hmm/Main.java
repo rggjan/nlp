@@ -2,6 +2,7 @@ package hmm;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Main {
 
@@ -12,6 +13,48 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		final boolean simple_texts = false;		
 		
+		//exercise_1(simple_texts);
+		exercise_2(simple_texts);
+	}
+	
+	private static void exercise_2(final boolean simple_texts)
+	throws IOException {
+		TextParser parser = new TextParser();
+		
+		// read training data
+		if (simple_texts) {
+			parser.readText("data/train.txt");	
+		} else {
+			for (int i=1; i<50; i++)
+				parser.readText("data/train_" + i + ".pos");
+		}
+		
+		ArrayList<ArrayList<String>> trainingList = parser.getSentences();
+		HashSet<String> trainingWords;
+		
+		for (ArrayList<String> sentence : trainingList) {
+			for (String word : sentence) {
+				trainingWords.add(word);
+			}
+		}
+		
+		final int numStates = 10;
+		
+		// Build unknown state collection
+		StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
+		
+		// read the test text
+		/*parser = new TextParser();
+		if (simple_texts) {
+			parser.readText("data/test.txt");
+		} else {
+			parser.readText("data/test_1.pos");
+		}
+		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();*/
+	}
+
+	private static void exercise_1(final boolean simple_texts)
+			throws IOException {
 		TextParser parser = new TextParser();
 		
 		// read training data

@@ -54,6 +54,7 @@ public class ForwardBackwardAlgorithm {
 				double probability;
 				probability = stateCollection.startState().nextStateProbability(qj);
 				probability *= qj.wordEmittingProbability(new Word(outputSencence.get(0)));
+				// TODO probably should not create "new" word
 				addToCache(index, qj, probability);
 				return probability;			
 			}
@@ -74,10 +75,12 @@ public class ForwardBackwardAlgorithm {
 				value = getAlphaBeta(index - 1, qj);
 				value *= qi.nextStateProbability(qj);
 				value *= qj.wordEmittingProbability(new Word(outputSencence.get(index - 1)));
+				// TODO probably should not create "new" word
 			} else {
 				value = getAlphaBeta(index + 1, qi);
 				value *= qj.nextStateProbability(qi);
 				value *= qi.wordEmittingProbability(new Word(outputSencence.get(index - 1)));
+				// TODO probably should not create "new" word
 			}
 			sum += value;
 		}

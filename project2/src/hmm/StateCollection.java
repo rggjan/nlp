@@ -2,6 +2,7 @@ package hmm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class StateCollection {
 	
@@ -76,6 +77,27 @@ public class StateCollection {
 		startState();
 		endState();
 		unknownState();
+	}
+
+	public StateCollection(int numStates, HashSet<String> all_words) {
+		super();
+		
+		// Add states to list
+		for (int i=0; i<numStates; i++) {
+			getStateTraining("<state_" + i + ">");
+		}
+		
+		// Add words to list
+		for (String word : all_words) {
+			words.put(word, new Word(word));
+		}
+		
+		// Set random word output probabilities
+		for (State state : states) {
+			state.addWordEmissionObservation(word)
+		}
+		
+		freeze();
 	}
 
 	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {
