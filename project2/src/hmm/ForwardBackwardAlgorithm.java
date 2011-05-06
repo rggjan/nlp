@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ForwardBackwardAlgorithm {
-	private StateCollection stateCollection;
-	private List<String> outputSencence;
-	private ArrayList< HashMap<State, Double> > cache;
-	private Boolean isForwardAlgorithm;
+	private final StateCollection stateCollection;
+	private final List<String> outputSencence;
+	private final ArrayList< HashMap<State, Double> > cache;
+	private final Boolean isForwardAlgorithm;
 	
 	public ForwardBackwardAlgorithm(final StateCollection hmm, final List<String> output, Boolean isForward) {
 		stateCollection = hmm;
