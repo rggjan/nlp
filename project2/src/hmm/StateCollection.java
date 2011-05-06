@@ -12,6 +12,10 @@ public class StateCollection {
 	public HashMap<String, Word> words=new HashMap<String, Word>();
 	private Random random;
 	
+	public void setWords(HashMap<String, Word> new_words) {
+		words = new_words;
+	}
+	
 	private State getStateTraining(String s){
 		if (s==null || s.equals(""))
 			throw new Error("invalid state name");
@@ -110,6 +114,51 @@ public class StateCollection {
 		}
 		
 		freeze();
+	}
+	
+	public StateCollection reEstimateProbabilites(ArrayList<ArrayList<String>> trainingSentences) {
+		StateCollection new_collection = new StateCollection();
+		
+		// Add states to list
+		for (int i=0; i<states.size(); i++) {
+			new_collection.getStateTraining("<state_" + i + ">");
+		}
+
+		// Add words to list
+		new_collection.setWords(words);
+		
+		// Estimate new transition probabilities
+		for (State qi : states.values()) {
+			for (State qj : states.values()) {
+				double ep_qi_qj = 0;
+				for (ArrayList<String> sentence : trainingSentences) {
+					ForwardBackwardAlgorithm forward_algorithm =
+						new ForwardBackwardAlgorithm(new_collection, sentence, true);
+					
+					ForwardBackwardAlgorithm backward_algorithm =
+						new ForwardBackwardAlgorithm(new_collection, sentence, false);
+					
+					double p_qi_qj_o = 0;
+					
+					for (int t=1; t<=sentence.size(); t++) {
+						double forward = forward_algorithm.getAlphaBeta(t, qi);
+						double backward = backward_algorithm.getAlphaBeta(t+1, qj);
+						
+						p_qi_qj_o += forward *
+							qi.nextStateProbability(qj) *
+							qj.wordEmittingProbability(sentence[i-1]) *
+							backward;
+						
+					}
+					
+					p_qi_qj_when_o = p_qi_qj_o / p_o;
+					
+					ep_qi_qj += p_qi_qj_when_o;
+				}
+				
+				new_qi.setStateTransitionObservation(new_qj, ep_qi_qj/ep_qi));
+			}
+		}
 	}
 
 	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {

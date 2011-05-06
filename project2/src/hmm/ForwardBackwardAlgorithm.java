@@ -10,7 +10,7 @@ public class ForwardBackwardAlgorithm {
 	private ArrayList< HashMap<State, Double> > cache;
 	private Boolean isForwardAlgorithm;
 	
-	private ForwardBackwardAlgorithm(final StateCollection hmm, final List<String> output, Boolean isForward) {
+	public ForwardBackwardAlgorithm(final StateCollection hmm, final List<String> output, Boolean isForward) {
 		stateCollection = hmm;
 		outputSencence = output;
 		
