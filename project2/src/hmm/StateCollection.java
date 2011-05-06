@@ -146,19 +146,67 @@ public class StateCollection {
 
 						p_qi_qj_o += forward *
 						qi.nextStateProbability(qj) *
-						qj.wordEmittingProbability(sentence[i-1]) *
+						qj.wordEmittingProbability(getWord(sentence.get(t+1))) *
 						backward;
-
 					}
 
-					p_qi_qj_when_o = p_qi_qj_o / p_o;
+					double p_o = forward_algorithm.getFinalProbability();
+					double p_qi_qj_when_o = p_qi_qj_o / p_o;
 
 					ep_qi_qj += p_qi_qj_when_o;
 				}
 
-				new_qi.setStateTransitionObservation(new_qj, ep_qi_qj/ep_qi));
+				// COMMENT: The following is not needed, as we normalize automatically
+				// in the get probability function!
+
+				/*double ep_qi = 0;
+				for (ArrayList<String> sentence : trainingSentences) {
+					for (State qj_any : states.values()) {
+						ep_qi +=
+					}
+				}*/
+
+				new_collection.getState(qi.name).setStateTransitionObservation(
+						new_collection.getState(qj.name), ep_qi_qj);
 			}
 		}
+
+		for (State qi : states.values()) {
+			for (Word word : words.values()) {
+				double p_vk_given_qj = 0;
+
+				for (ArrayList<String> sentence : trainingSentences) {
+					ForwardBackwardAlgorithm forward_algorithm =
+						new ForwardBackwardAlgorithm(new_collection, sentence, true);
+
+					ForwardBackwardAlgorithm backward_algorithm =
+						new ForwardBackwardAlgorithm(new_collection, sentence, false);
+
+					double p_vk_qi_o = 0;
+
+					for (int t=0; t<sentence.size(); t++) {
+						if (sentence.get(t).equals(word.name)) {
+							double forward = forward_algorithm.getAlphaBeta(t, qi);
+							double backward = backward_algorithm.getAlphaBeta(t, qi);
+
+							p_vk_qi_o += forward * backward;
+						}
+					}
+
+					double p_o = forward_algorithm.getFinalProbability();
+					double p_vk_qi_when_o = p_vk_qi_o / p_o;
+
+					p_vk_given_qj += p_vk_qi_when_o;
+				}
+
+
+				// COMMENT: Normalization should be done automatically... REALLY?
+				new_collection.getState(qi.name).setWordEmissionObservations(
+						word, p_vk_given_qj);
+			}
+		}
+
+		return new_collection;
 	}
 
 	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {

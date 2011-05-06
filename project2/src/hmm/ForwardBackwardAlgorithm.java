@@ -40,6 +40,7 @@ public class ForwardBackwardAlgorithm {
 		return -1;
 	}
 
+	// TODO: Check if this is the same for forward and backward!
 	public double getFinalProbability() {
 		// TODO cache that function?
 
