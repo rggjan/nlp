@@ -34,10 +34,15 @@ public class ForwardBackwardAlgorithm {
 
 		stateCache = cache.get(index);
 
-		if (stateCache != null)
-			return stateCache.get(qj);
-		else
+		if (stateCache != null) {
+			Double value = stateCache.get(qj);
+			if (value != null)
+				return stateCache.get(qj);
+			else
+				return -1;
+		} else {
 			return -1;
+		}
 	}
 
 	// TODO: Check if this is the same for forward and backward!
