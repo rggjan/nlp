@@ -140,7 +140,7 @@ public class StateCollection {
 
 					double p_qi_qj_o = 0;
 
-					for (int t=0; t<sentence.size(); t++) {
+					for (int t = 0; t < sentence.size() - 1; t++) {
 						double forward = forward_algorithm.getAlphaBeta(t, qi);
 						double backward = backward_algorithm.getAlphaBeta(t+1, qj);
 
