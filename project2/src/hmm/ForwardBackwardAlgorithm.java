@@ -1,20 +1,19 @@
 package hmm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ForwardBackwardAlgorithm {
 	private final StateCollection stateCollection;
 	private final List<String> outputSencence;
-	private final ArrayList< HashMap<State, Double> > cache;
+	private final HashMap<Integer, HashMap<State, Double>> cache;
 	private final Boolean isForwardAlgorithm;
 
 	public ForwardBackwardAlgorithm(final StateCollection hmm, final List<String> output, Boolean isForward) {
 		stateCollection = hmm;
 		outputSencence = output;
 
-		cache = new ArrayList< HashMap<State, Double> >();
+		cache = new HashMap<Integer, HashMap<State, Double>>();
 		isForwardAlgorithm = isForward;
 	}
 
@@ -22,10 +21,10 @@ public class ForwardBackwardAlgorithm {
 		HashMap<State, Double> stateCache;
 
 		stateCache = cache.get(index);
-		if (stateCache == null) {
+
+		if (stateCache == null)
 			stateCache = new HashMap<State, Double>();
-			cache.set(index, stateCache);
-		}
+		cache.put(index, stateCache);
 
 		stateCache.put(qj, probability);
 	}
@@ -34,10 +33,11 @@ public class ForwardBackwardAlgorithm {
 		HashMap<State, Double> stateCache;
 
 		stateCache = cache.get(index);
+
 		if (stateCache != null)
 			return stateCache.get(qj);
-
-		return -1;
+		else
+			return -1;
 	}
 
 	// TODO: Check if this is the same for forward and backward!
