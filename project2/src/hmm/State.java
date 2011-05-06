@@ -27,6 +27,10 @@ public class State {
 			emittedWordCounts.put(word, emittedWordCounts.get(word) + 1);
 		}
 	}
+	
+	public void setWordEmissionObservations(Word word, int numberOfObservations) {
+		emittedWordCounts.put(word, numberOfObservations);
+	}
 
 	// Add next State, null is final State
 	public void addStateTransitionObservation(State nextState) {
@@ -37,6 +41,10 @@ public class State {
 		else{
 			nextStateCounts.put(nextState, nextStateCounts.get(nextState) + 1);
 		}
+	}
+	
+	public void setStateTransitionObservation(State nextState, int numberOfObservations) {
+		nextStateCounts.put(nextState, numberOfObservations);
 	}
 	
 	public String toString() {

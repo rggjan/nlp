@@ -3,12 +3,14 @@ package hmm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 public class StateCollection {
 	
 	private boolean isFrozen;
 	public HashMap<String, State> states=new HashMap<String, State>();
 	public HashMap<String, Word> words=new HashMap<String, Word>();
+	private Random random;
 	
 	private State getStateTraining(String s){
 		if (s==null || s.equals(""))
@@ -82,19 +84,29 @@ public class StateCollection {
 	public StateCollection(int numStates, HashSet<String> all_words) {
 		super();
 		
+		random = new Random();
+		
 		// Add states to list
 		for (int i=0; i<numStates; i++) {
 			getStateTraining("<state_" + i + ">");
 		}
-		
+
 		// Add words to list
-		for (String word : all_words) {
-			words.put(word, new Word(word));
+		for (String string : all_words) {
+			Word word = new Word(string);
+			words.put(string, word);
+			
+			// Set random word output probabilities
+			for (State state : states.values()) {
+				state.setWordEmissionObservations(word, random.nextInt()%1000000);
+			}
 		}
 		
-		// Set random word output probabilities
-		for (State state : states) {
-			state.addWordEmissionObservation(word)
+		// Set random transmission probabilities
+		for (State state1 : states.values()) {
+			for (State state2 : states.values()) {
+				state1.setStateTransitionObservation(state2, random.nextInt()%1000000);
+			}
 		}
 		
 		freeze();

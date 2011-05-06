@@ -30,7 +30,7 @@ public class Main {
 		}
 		
 		ArrayList<ArrayList<String>> trainingList = parser.getSentences();
-		HashSet<String> trainingWords;
+		HashSet<String> trainingWords = new HashSet<String>();
 		
 		for (ArrayList<String> sentence : trainingList) {
 			for (String word : sentence) {
