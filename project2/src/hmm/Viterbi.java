@@ -2,15 +2,16 @@ package hmm;
 
 import java.util.*;
 
-public class Viterbi {
+public class Viterbi<TStateCollection extends StateCollection<TState>,TState extends State> {
 	
-	private Cache<Integer,State,Double> v;
-	private Cache<Integer,State,State> d;
+	private CachedFunction<Integer,TState,Double> v;
+	private CachedFunction<Integer,TState,TState> d;
 	
-	private List<State> states=new LinkedList<State>();
+	// list of the best states found so far
+	private List<TState> states=new LinkedList<TState>();
 	private double probability;
 	
-	private Viterbi(final StateCollection hmm, final List<String> output) {
+	private Viterbi(final TStateCollection hmm, final List<String> output) {
 		// create cached method for v
 		v=createV(hmm, output);
 		// create cached method for d
@@ -18,8 +19,8 @@ public class Viterbi {
 		
 		probability=-1;
 		
-		State bestLast=null;
-		for (State prevState:  hmm.states.values()){
+		TState bestLast=null;
+		for (TState prevState:  hmm.getStates()){
 			if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
 			
 			double f=	
@@ -35,26 +36,26 @@ public class Viterbi {
 	}
 
 
-	private void fillStates(int t,State state) {
+	private void fillStates(int t,TState bestLast) {
 		if (t>0){
-			fillStates(t-1, d.get(t, state));
+			fillStates(t-1, d.get(t, bestLast));
 		}
-		states.add(state);
+		states.add(bestLast);
 	}
 
 
-	private Cache<Integer, State, State> createD(final StateCollection hmm,
+	private CachedFunction<Integer, TState, TState> createD(final TStateCollection hmm,
 			final List<String> output) {
-		return new Cache<Integer, State, State>(new Cache.CachedFunction<Integer, State, State>() {
+		return new CachedFunction<Integer, TState, TState>(new CachedFunction.IFunction<Integer, TState, TState>() {
 
 			@Override
-			public State evaluate(Integer t, State state) {
+			public TState evaluate(Integer t, TState state) {
 				if (t==0){
 					return hmm.startState();
 				}
 				double result=-1;
-				State bestPrev=null;
-				for (State prevState:  hmm.states.values()){
+				TState bestPrev=null;
+				for (TState prevState:  hmm.getStates()){
 					if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
 					double f=
 						v.get(t-1, prevState)
@@ -71,19 +72,19 @@ public class Viterbi {
 	}
 
 
-	private Cache<Integer, State, Double> createV(final StateCollection hmm,
+	private CachedFunction<Integer, TState, Double> createV(final TStateCollection hmm,
 			final List<String> output) {
-		return new Cache<Integer, State, Double>(new Cache.CachedFunction<Integer, State, Double>() {
+		return new CachedFunction<Integer, TState, Double>(new CachedFunction.IFunction<Integer, TState, Double>() {
 
 			@Override
-			public Double evaluate(Integer t, State state) {
+			public Double evaluate(Integer t, TState state) {
 				if (t==0){
 					return 
 						hmm.startState().nextStateProbability(state)
 						*state.wordEmittingProbability(hmm.getWord(output.get(t)));
 				}
 				double result=0;
-				for (State prevState:  hmm.states.values()){
+				for (TState prevState:  hmm.getStates()){
 					if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
 					double f=
 						v.get(t-1, prevState)
@@ -97,12 +98,13 @@ public class Viterbi {
 	}
 
 	
-	public static Viterbi viterbi(StateCollection hmm, List<String> output){
-		return new Viterbi(hmm,output);
+	public static <TStateCollection extends StateCollection<TState>,TState extends State>
+		Viterbi<TStateCollection,TState> viterbi(TStateCollection hmm, List<String> output){
+		return new Viterbi<TStateCollection,TState>(hmm,output);
 	}
 
 
-	public List<State> getStates() {
+	public List<TState> getStates() {
 		return states;
 	}
 

@@ -11,7 +11,7 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = false;
+		final boolean simple_texts = true;
 
 		//exercise_1(simple_texts);
 		exercise_2(simple_texts);
@@ -38,13 +38,16 @@ public class Main {
 			}
 		}
 
-		final int numStates = 10;
+		final int stateCount = 10;
 
+		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
+		
+		System.out.println(hmm);
 		// Build unknown state collection
-		StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
+		//StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
 
-		hiddenCollection = hiddenCollection
-				.reEstimateProbabilites(trainingList);
+		//hiddenCollection = hiddenCollection
+		//		.reEstimateProbabilites(trainingList);
 
 		// read the test text
 		/*parser = new TextParser();
@@ -69,7 +72,7 @@ public class Main {
 		}
 
 		// get the state collection ( trained HMM)
-		StateCollection collection = parser.getStateCollection();
+		CountedStateCollection collection = parser.getStateCollection();
 		//System.out.print(collection);
 
 		// read the test text
@@ -112,7 +115,7 @@ public class Main {
 			}
 			System.out.println();
 
-			Viterbi viterbi=Viterbi.viterbi(collection, notTagSentence);
+			Viterbi<CountedStateCollection,CountedState> viterbi=Viterbi.viterbi(collection, notTagSentence);
 
 			int numCorrect = 0;
 			int numTotal = 0;
