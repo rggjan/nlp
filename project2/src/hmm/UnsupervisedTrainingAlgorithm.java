@@ -73,6 +73,7 @@ public class UnsupervisedTrainingAlgorithm {
 				int i=0;
 				for (List<Word> list: trainingSentences){
 					probability*=alphas.get(i).getFinalProbability();
+					i++;
 				}
 			}
 			
@@ -102,7 +103,8 @@ public class UnsupervisedTrainingAlgorithm {
 					int i=0;
 					for (List<Word> sentence: trainingSentences){
 						for( int t=-1; t<sentence.size(); t++){
-							double d=xi(t,sentence,a,b,alphas.get(i),betas.get(i),hmm);
+							double d=xi(t,sentence,a,b,alphas.get(i),betas.get(i),hmm)
+								*sentence.size(); //weight by sentence length
 							numerator+=d;
 							denominator+=d;
 						}
@@ -135,7 +137,8 @@ public class UnsupervisedTrainingAlgorithm {
 					for (List<Word> sentence: trainingSentences){
 						int t=0;
 						for( Word w: sentence){
-							denominator+=gamma(t,w,a,alphas.get(i),betas.get(i));
+							denominator+=gamma(t,a,alphas.get(i),betas.get(i))
+								*sentence.size(); //weight by sentence length
 							t++;
 						}
 						i++;
@@ -151,7 +154,8 @@ public class UnsupervisedTrainingAlgorithm {
 						int t=0;
 						for( Word w: sentence){
 							if (w==word)
-								numerator+=gamma(t,word,a,alphas.get(i),betas.get(i));
+								numerator+=gamma(t,a,alphas.get(i),betas.get(i))
+								*sentence.size(); //weighten by sentence length
 							t++;
 						}
 						i++;
@@ -204,7 +208,7 @@ public class UnsupervisedTrainingAlgorithm {
 	 * @param beta
 	 * @return
 	 */
-	private static double gamma(int t,Word w, OptimizedState a, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta){
+	private static double gamma(int t, OptimizedState a, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta){
 		return
 			alpha.get(t,a)
 			*beta.get(t,a)
