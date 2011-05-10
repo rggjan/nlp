@@ -1,5 +1,6 @@
 package hmm;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -91,8 +92,8 @@ public abstract class StateCollection<T extends State> {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public double calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
-		double probability = 1;
+	public BigDecimal calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
+		BigDecimal probability = BigDecimal.ONE;
 		T lastState = startState();
 	
 		for (String wordPair : sentence) {
@@ -104,15 +105,15 @@ public abstract class StateCollection<T extends State> {
 			T state=getState(stateString);
 	
 			// Multiply with tag-to-tag probability
-			probability *= lastState.nextStateProbability(state);
+			probability=probability.multiply(lastState.nextStateProbability(state));
 			// Multiply with tag-to-word probability
-			probability *= state.wordEmittingProbability(word);
+			probability=probability.multiply(state.wordEmittingProbability(word));
 	
 			lastState = state;
 		}
 	
 		// Multiply with final-tag probability
-		probability *= lastState.nextStateProbability(unknownState());
+		probability=probability.multiply(lastState.nextStateProbability(unknownState()));
 		return probability;
 	}
 
@@ -121,6 +122,8 @@ public abstract class StateCollection<T extends State> {
 		StringBuilder builder=new StringBuilder();
 	
 		// print transition matrix
+		
+		// print top row
 		builder.append(String.format("\t"));
 		for (T column: states.values()){
 			builder.append(String.format("%s\t",column.name));
@@ -128,9 +131,12 @@ public abstract class StateCollection<T extends State> {
 		builder.append(String.format("\n"));
 	
 		for (T row: states.values()){
+			// print row name
 			builder.append(String.format("%s\t",row.name));
+			
+			// output all values
 			for (T column: states.values()){
-				builder.append(String.format("%.2f\t",row.nextStateProbability(column)));
+				builder.append(String.format("%.2f\t",row.nextStateProbability(column).doubleValue()));
 			}
 			builder.append(String.format("\n"));
 		}
@@ -146,7 +152,7 @@ public abstract class StateCollection<T extends State> {
 		for (T row: states.values()){
 			builder.append(String.format("%s\t",row.name));
 			for (Word column: words.values()){
-				builder.append(String.format("%.2f\t",row.wordEmittingProbability(column)));
+				builder.append(String.format("%.2f\t",row.wordEmittingProbability(column).doubleValue()));
 			}
 			builder.append(String.format("\n"));
 		}

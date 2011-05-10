@@ -1,5 +1,6 @@
 package hmm;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 /**
@@ -105,12 +106,12 @@ public class CountedState extends State<CountedState>{
 	}
 
 	@Override
-	public double wordEmittingProbability(Word word) {
-		return (double) wordCount(word)/(double)totalWordCount();
+	public BigDecimal wordEmittingProbability(Word word) {
+		return new BigDecimal((double) wordCount(word)/(double)totalWordCount());
 	}
 
 	@Override
-	public double nextStateProbability(CountedState state) {
-		return (double) nextStateCount(state)/(double)totalNextStateCount();
+	public BigDecimal nextStateProbability(CountedState state) {
+		return new BigDecimal((double) nextStateCount(state)/(double)totalNextStateCount());
 	}
 }

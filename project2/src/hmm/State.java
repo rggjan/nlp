@@ -1,11 +1,13 @@
 package hmm;
 
+import java.math.BigDecimal;
+
 public abstract class State<T extends State> {
 
 	public String name;
 	
-	public abstract double nextStateProbability(T state);
+	public abstract BigDecimal nextStateProbability(T state);
 
-	public abstract double wordEmittingProbability(Word word);
+	public abstract BigDecimal wordEmittingProbability(Word word);
 
 }

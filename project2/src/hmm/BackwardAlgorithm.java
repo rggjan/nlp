@@ -2,14 +2,18 @@ package hmm;
 
 import hmm.CachedFunction.IFunction;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,TState extends State> {
-	private CachedFunction<Integer, TState, Double> beta;
+	private static MathContext mc=new MathContext(10,RoundingMode.HALF_EVEN);
+	private CachedFunction<Integer, TState, BigDecimal> beta;
 	private TStateCollection hmm;
 	private List<Word> output;
 	
-	public double get(int t, TState state){
+	public BigDecimal get(int t, TState state){
 		return beta.get(t, state);
 	}
 	
@@ -19,17 +23,17 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 		this.output=output;
 	}
 
-	private CachedFunction<Integer, TState, Double> createBeta() {
-		return new CachedFunction<Integer, TState, Double>(new IFunction<Integer, TState,  Double>() {
+	private CachedFunction<Integer, TState, BigDecimal> createBeta() {
+		return new CachedFunction<Integer, TState, BigDecimal>(new IFunction<Integer, TState,  BigDecimal>() {
 
 			@Override
-			public Double evaluate(Integer index, TState state) {
+			public BigDecimal evaluate(Integer index, TState state) {
 				if (index==output.size())
 				{
 					if (state==hmm.endState())
-						return 1.0;
+						return BigDecimal.ONE;
 					else
-						return 0.0; 
+						return BigDecimal.ZERO; 
 				}
 				// base case
 				if (index==output.size()-1){
@@ -38,13 +42,13 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 				}
 				
 				// recursion
-				double result=0;
+				BigDecimal result=BigDecimal.ZERO;
 				for (TState nextState: hmm.getStates()){
 					if (nextState==hmm.endState()||nextState==hmm.startState()) continue;
-					result+=
+					result=result.add(
 						beta.get(index+1, nextState)
-						*state.nextStateProbability(nextState)
-						*nextState.wordEmittingProbability(output.get(index+1));
+						.multiply(state.nextStateProbability(nextState))
+						.multiply(nextState.wordEmittingProbability(output.get(index+1))),mc);
 				}
 				
 				return result;
@@ -53,20 +57,21 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 	}
 	
 	// TODO: Check if this is the same for forward and backward!
-	public double getFinalProbability() {
+	public BigDecimal getFinalProbability() {
 		// TODO cache that function?
 
-		double sum = 0;
+		BigDecimal sum = BigDecimal.ZERO;
 
 		for (TState state : hmm.getStates()) {
 			if (state==hmm.endState()||state==hmm.startState()) continue;
-			double value;
+			BigDecimal value;
 
-			value = get(0, state);
-			value *= hmm.startState().nextStateProbability(state);
-			value *= state.wordEmittingProbability(output.get(0));
+			value = 
+				get(0, state)
+				.multiply(hmm.startState().nextStateProbability(state))
+				.multiply(state.wordEmittingProbability(output.get(0)),mc);
 			
-			sum += value;
+			sum=sum.add(value);
 		}
 		return sum;
 	}

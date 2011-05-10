@@ -2,15 +2,18 @@ package hmm;
 
 import hmm.CachedFunction.IFunction;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,TState extends State> {
-
-	private CachedFunction<Integer, TState, Double> alpha;
+	private static MathContext mc=new MathContext(10,RoundingMode.HALF_EVEN);
+	private CachedFunction<Integer, TState, BigDecimal> alpha;
 	private TStateCollection hmm;
 	private List<Word> output;
 	
-	public double get(int t, TState state){
+	public BigDecimal get(int t, TState state){
 		return alpha.get(t, state);
 	}
 	
@@ -20,32 +23,32 @@ public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,T
 		alpha=createAlpha();
 	}
 
-	private CachedFunction<Integer, TState, Double> createAlpha() {
-		return new CachedFunction<Integer, TState, Double>(new IFunction<Integer, TState,  Double>() {
+	private CachedFunction<Integer, TState, BigDecimal> createAlpha() {
+		return new CachedFunction<Integer, TState, BigDecimal>(new IFunction<Integer, TState,  BigDecimal>() {
 
 			@Override
-			public Double evaluate(Integer index, TState state) {
+			public BigDecimal evaluate(Integer index, TState state) {
 				if (index==-1){
 					if (state==hmm.startState())
-						return 1.0;
+						return BigDecimal.ONE;
 					else
-						return 0.0;
+						return BigDecimal.ZERO;
 				}
 				// base case
 				if (index==0){
 					return 
 						hmm.startState().nextStateProbability(state)
-						*state.wordEmittingProbability(output.get(0));
+						.multiply(state.wordEmittingProbability(output.get(0)),mc);
 				}
 				
 				// recursion
-				double result=0;
+				BigDecimal result=BigDecimal.ZERO;
 				for (TState prevState: hmm.getStates()){
 					if (prevState==hmm.endState()||prevState==hmm.startState()) continue;
-					result+=
+					result=result.add(
 						alpha.get(index-1, prevState)
-						*prevState.nextStateProbability(state)
-						*state.wordEmittingProbability(output.get(index));
+						.multiply(prevState.nextStateProbability(state),mc)
+						.multiply(state.wordEmittingProbability(output.get(index)),mc),mc);
 				}
 				
 				return result;
@@ -54,19 +57,20 @@ public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,T
 	}
 	
 	// TODO: Check if this is the same for forward and backward!
-	public double getFinalProbability() {
+	public BigDecimal getFinalProbability() {
 		// TODO cache that function?
 
-		double sum = 0;
+		BigDecimal sum = BigDecimal.ZERO;
 
 		for (TState state : hmm.getStates()) {
 			if (state==hmm.endState()||state==hmm.startState()) continue;
-			double value;
+			BigDecimal value;
 		
-			value = get(output.size() - 1, state);
-			value *= state.nextStateProbability(hmm.endState());
+			value = 
+				get(output.size() - 1, state)
+				.multiply(state.nextStateProbability(hmm.endState()),mc);
 			
-			sum += value;
+			sum=sum.add(value);
 		}
 		return sum;
 	}

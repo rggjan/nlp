@@ -11,7 +11,7 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = true;
+		final boolean simple_texts = false;
 
 		//exercise_1(simple_texts);
 		exercise_2(simple_texts);
@@ -25,7 +25,7 @@ public class Main {
 		if (simple_texts) {
 			parser.readText("data/train.txt");
 		} else {
-			for (int i=1; i<50; i++)
+			for (int i=1; i<5; i++)
 				parser.readText("data/train_" + i + ".pos");
 		}
 
