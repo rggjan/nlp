@@ -25,6 +25,12 @@ public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,T
 
 			@Override
 			public Double evaluate(Integer index, TState state) {
+				if (index==-1){
+					if (state==hmm.startState())
+						return 1.0;
+					else
+						return 0.0;
+				}
 				// base case
 				if (index==0){
 					return 
@@ -35,6 +41,7 @@ public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,T
 				// recursion
 				double result=0;
 				for (TState prevState: hmm.getStates()){
+					if (prevState==hmm.endState()||prevState==hmm.startState()) continue;
 					result+=
 						alpha.get(index-1, prevState)
 						*prevState.nextStateProbability(state)
@@ -53,6 +60,7 @@ public class ForwardAlgorithm<TStateCollection extends StateCollection<TState>,T
 		double sum = 0;
 
 		for (TState state : hmm.getStates()) {
+			if (state==hmm.endState()||state==hmm.startState()) continue;
 			double value;
 		
 			value = get(output.size() - 1, state);

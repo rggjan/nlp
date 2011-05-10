@@ -24,6 +24,13 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 
 			@Override
 			public Double evaluate(Integer index, TState state) {
+				if (index==output.size())
+				{
+					if (state==hmm.endState())
+						return 1.0;
+					else
+						return 0.0; 
+				}
 				// base case
 				if (index==output.size()-1){
 					return 
@@ -33,6 +40,7 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 				// recursion
 				double result=0;
 				for (TState nextState: hmm.getStates()){
+					if (nextState==hmm.endState()||nextState==hmm.startState()) continue;
 					result+=
 						beta.get(index+1, nextState)
 						*state.nextStateProbability(nextState)
@@ -51,6 +59,7 @@ public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,
 		double sum = 0;
 
 		for (TState state : hmm.getStates()) {
+			if (state==hmm.endState()||state==hmm.startState()) continue;
 			double value;
 
 			value = get(0, state);

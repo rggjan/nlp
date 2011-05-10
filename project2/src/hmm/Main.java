@@ -38,7 +38,7 @@ public class Main {
 			}
 		}
 
-		final int stateCount = 10;
+		final int stateCount = 5;
 
 		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
 		
