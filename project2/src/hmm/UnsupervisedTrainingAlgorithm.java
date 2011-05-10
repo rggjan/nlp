@@ -167,6 +167,21 @@ public class UnsupervisedTrainingAlgorithm {
 		// never reached
 	}
 	
+	/**
+	 * Formulae according to "Speech and language processing" by Daniel Jurafsky and James H. Martin
+	 * Xi=Probability of traversing from state i to state j at time t
+	 * Xi_t(i,j)=P(q_t=i,q_{t+1}=j | O,\lambda)
+	 * =\frac{\alpha_t(i)a_{ij}b_j(o_{t+1})\beta_{t+1}(j)}{\alpha_T(N)}
+	 * 
+	 * @param t	input position
+	 * @param sentence input sentence
+	 * @param a state i
+	 * @param b state j
+	 * @param alpha forward probability
+	 * @param beta backward probability
+	 * @param hmm 
+	 * @return
+	 */
 	private static double xi(int t, List<Word> sentence, OptimizedState a, OptimizedState b, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta, OptimizedStateCollection hmm){
 		double 
 			result=alpha.get(t, a);
@@ -174,9 +189,21 @@ public class UnsupervisedTrainingAlgorithm {
 			if ((t+1)<sentence.size())
 				result*=b.wordEmittingProbability(sentence.get(t+1));
 			result*=beta.get(t+1,b);
+			if (alpha.getFinalProbability()!=0)
+				result/=alpha.getFinalProbability();
 		return result;
 	}
 	
+	/**
+	 * Formulae according to "Speech and language processing" by Daniel Jurafsky and James H. Martin
+	 * Gamma==probability of beeing in state j at time t
+	 * @param t time
+	 * @param w word at time t
+	 * @param a state j
+	 * @param alpha
+	 * @param beta
+	 * @return
+	 */
 	private static double gamma(int t,Word w, OptimizedState a, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta){
 		return
 			alpha.get(t,a)
