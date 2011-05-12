@@ -52,8 +52,11 @@ public class Main {
 		// System.out.println(System.currentTimeMillis()-start);
 
 		System.out
+		.println("=====================================================");
+		System.out
 		.println("Finished training! (Less than 10 percent improvement)");
-		System.out.println("===========================================");
+		System.out
+		.println("=====================================================");
 		System.out.println("Trained HMM with " + stateCount + " states:");
 
 		// Print the HMM we got
@@ -76,7 +79,6 @@ public class Main {
 		System.out.println("==========================================");
 
 		for (ArrayList<String> sentence : sentenceList) {
-			System.out.println("===================");
 			ArrayList<String> notTagSentence = new ArrayList<String>();
 
 			for (String word : sentence) {
@@ -97,6 +99,7 @@ public class Main {
 			System.out.println();
 
 			System.out.println("Probability: " + viterbi.getProbability());
+			System.out.println("-----------------------------------");
 		}
 	}
 
