@@ -39,6 +39,10 @@ public class BigDoubleTest {
 		a=BigDouble.valueOf(1e100);
 		b=BigDouble.valueOf(2);
 		assertEquals(1.0e100-2.0, a.subtract(b).doubleValue());
+		
+		a=BigDouble.valueOf(0);
+		b=BigDouble.valueOf(2);
+		assertEquals(0-2.0, a.subtract(b).doubleValue());
 	}
 	
 	@Test
@@ -54,6 +58,10 @@ public class BigDoubleTest {
 		a=BigDouble.valueOf(1e100);
 		b=BigDouble.valueOf(2);
 		assertEquals(1.0e100*2.0, a.multiply(b).doubleValue());
+		
+		a=BigDouble.valueOf(0);
+		b=BigDouble.valueOf(2);
+		assertEquals(0*2.0, a.multiply(b).doubleValue());
 	}
 	
 	@Test
@@ -69,6 +77,10 @@ public class BigDoubleTest {
 		a=BigDouble.valueOf(1e100);
 		b=BigDouble.valueOf(2);
 		assertEquals(1.0e100/2.0, a.divide(b).doubleValue());
+		
+		a=BigDouble.valueOf(0);
+		b=BigDouble.valueOf(2);
+		assertEquals(0/2.0, a.divide(b).doubleValue());
 	}
 	
 }

@@ -12,7 +12,7 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = true;
+		final boolean simple_texts = false;
 
 		BigDouble n=BigDouble.valueOf(24.5,100000);
 		BigDouble m=new BigDouble(-3);
@@ -43,13 +43,13 @@ public class Main {
 			}
 		}
 
-		final int stateCount = 5;
+		final int stateCount = 10;
 
 		long start=System.currentTimeMillis();
 		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
 		System.out.println(System.currentTimeMillis()-start);
 		
-		//System.out.println(hmm);
+		System.out.println(hmm);
 		// Build unknown state collection
 		//StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
 
@@ -74,7 +74,7 @@ public class Main {
 		if (simple_texts) {
 			parser.readText("data/train.txt");
 		} else {
-			for (int i=1; i<50; i++)
+			for (int i=1; i<2; i++)
 				parser.readText("data/train_" + i + ".pos");
 		}
 

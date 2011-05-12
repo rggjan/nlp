@@ -61,16 +61,59 @@ public class BackwardAlgorithmTest {
 			=new BackwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,sentence);
 		
 		assertEquals(1.0,beta.get(1,hmm.endState()).doubleValue());
-		assertEquals(1.0,beta.get(0,state1).doubleValue());
-		assertEquals(0.5,beta.getFinalProbability().doubleValue());
+		assertEquals(0.1,beta.get(0,state1).doubleValue());
+		assertEquals(0.5*0.1,beta.getFinalProbability().doubleValue());
 		
 		sentence.add(word1);
 		beta=new BackwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,sentence);
 		
 		assertEquals(1.0,beta.get(2,hmm.endState()).doubleValue());
 		assertEquals(1.0,beta.get(1,state2).doubleValue());
-		assertEquals(1.0,beta.get(0,state1).doubleValue());
+		assertEquals(0.9,beta.get(0,state1).doubleValue());
 		
-		assertEquals(0.5,beta.getFinalProbability().doubleValue());
+		assertEquals(0.9*0.5,beta.getFinalProbability().doubleValue());
+	}
+	
+	@Test
+	public void TestHard(){
+		OptimizedStateCollection hmm=new OptimizedStateCollection();
+		OptimizedState state1=hmm.getStateTraining("state1");
+		OptimizedState state2=hmm.getStateTraining("state2");
+		
+		state1.setNextStateProbability(hmm.endState(), BigDouble.valueOf(0.1));
+		state1.setNextStateProbability(state2, BigDouble.valueOf(0.9));
+		
+		state2.setNextStateProbability(hmm.endState(), BigDouble.valueOf(0.7));
+		state2.setNextStateProbability(state1, BigDouble.valueOf(0.3));
+		
+		hmm.startState().setNextStateProbability(state1, BigDouble.valueOf(0.4));
+		hmm.startState().setNextStateProbability(state2, BigDouble.valueOf(0.6));
+		
+		Word word1=hmm.getWordTraining("word1");
+		Word word2=hmm.getWordTraining("word2");
+		
+		state1.setWordEmissionProbability(word1, BigDouble.valueOf(0.5));
+		state1.setWordEmissionProbability(word2, BigDouble.valueOf(0.5));
+		state2.setWordEmissionProbability(word1, BigDouble.valueOf(0.2));
+		state2.setWordEmissionProbability(word2, BigDouble.valueOf(0.8));
+		
+		List<Word> sentence=new ArrayList<Word>();
+		sentence.add(word1);
+		
+		BackwardAlgorithm<OptimizedStateCollection, OptimizedState> beta
+			=new BackwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,sentence);
+		
+		assertEquals(1.0,beta.get(1,hmm.endState()).doubleValue());
+		assertEquals(0.1,beta.get(0,state1).doubleValue());
+		assertEquals(0.5*0.4*0.1+0.6*0.2*0.7,beta.getFinalProbability().doubleValue(),1e-12);
+		
+		sentence.add(word1);
+		beta=new BackwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,sentence);
+		
+		assertEquals(1.0,beta.get(2,hmm.endState()).doubleValue());
+		assertEquals(0.7,beta.get(1,state2).doubleValue());
+		assertEquals(0.9*0.2*0.7,beta.get(0,state1).doubleValue());
+		
+		assertEquals(0.4*0.5*0.9*0.2*0.7+0.6*0.2*0.3*0.5*0.1,beta.getFinalProbability().doubleValue());
 	}
 }

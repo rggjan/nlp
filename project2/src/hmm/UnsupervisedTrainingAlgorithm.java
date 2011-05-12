@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class UnsupervisedTrainingAlgorithm {
-	private static Random random=new Random(1);
+	private static Random random=new Random(3);
 	public static OptimizedStateCollection train(ArrayList<ArrayList<String>> trainingSentenceStrings, int stateCount){
 		OptimizedStateCollection hmm=new OptimizedStateCollection();
 		hmm.states.remove(hmm.unknownState().name);
@@ -31,7 +31,8 @@ public class UnsupervisedTrainingAlgorithm {
 		for (List<String> list: trainingSentenceStrings){
 			ArrayList<Word> sentence=new ArrayList<Word>();
 			for (String word: list){
-				sentence.add(hmm.getWordTraining(word));
+				String[] parts=word.split("/");
+				sentence.add(hmm.getWordTraining(parts[0]));
 			}
 			trainingSentences.add(sentence);
 		}
@@ -41,6 +42,10 @@ public class UnsupervisedTrainingAlgorithm {
 			for (Word w: hmm.words.values())
 				a.setWordEmissionProbability(w, BigDouble.valueOf(random.nextDouble()));
 		
+		// clear transitions to the start
+		for (OptimizedState a: hmm.getStates()){
+			a.setNextStateProbability(hmm.startState(), BigDouble.ZERO);
+		}
 		// normalize all probabilitis
 		for (OptimizedState a: hmm.getStates())
 			a.normalize();
@@ -57,6 +62,7 @@ public class UnsupervisedTrainingAlgorithm {
 			ArrayList<BackwardAlgorithm<OptimizedStateCollection, OptimizedState>>
 				betas=new ArrayList<BackwardAlgorithm<OptimizedStateCollection,OptimizedState>>();
 			
+			//System.out.print(hmm);
 			for (List<Word> list: trainingSentences){
 				ForwardAlgorithm<OptimizedStateCollection, OptimizedState> alpha = new ForwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,list);
 				alphas.add(alpha);
@@ -171,7 +177,7 @@ public class UnsupervisedTrainingAlgorithm {
 				
 			}
 			hmm=newHmm;
-			return hmm;
+			//return hmm;
 		} while (true); // return statement is located above
 		
 		// never reached

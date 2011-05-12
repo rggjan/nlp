@@ -16,7 +16,12 @@ import java.util.Hashtable;
  * @param <TR>
  */
 public class CachedFunction<T1,T2,TR>{
-	private Hashtable<T1, Hashtable<T2, TR>> map=new Hashtable<T1, Hashtable<T2,TR>>();
+	private class Pair extends hmm.Pair<T1, T2>{
+		public Pair(T1 first, T2 second){
+			super(first,second);
+		}
+	}
+	private Hashtable<Pair, TR> map=new Hashtable<Pair, TR>();
 	private IFunction<T1, T2, TR> func;
 	
 	public CachedFunction(IFunction<T1, T2, TR> func){
@@ -30,23 +35,18 @@ public class CachedFunction<T1,T2,TR>{
 	 * @return
 	 */
 	public TR get(T1 arg1, T2 arg2){
-		// make sure the map contains an entry for the first argument
-		if (!map.containsKey(arg1)){
-			map.put(arg1, new Hashtable<T2, TR>());
-		}
+		Pair key=new Pair(arg1, arg2);
 		
-		Hashtable<T2,TR> m=map.get(arg1);
-		
-		if (m.containsKey(arg2)){
+		if (map.containsKey(key)){
 			// return the cached result
-			return m.get(arg2);
+			return map.get(key);
 		}
 		else{
 			// evaluate the function
 			TR result=func.evaluate(arg1, arg2);
 			
 			// store the result of the function evaluation in the cache
-			m.put(arg2, result);
+			map.put(key, result);
 			
 			// return the result
 			return result;
