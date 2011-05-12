@@ -1,6 +1,5 @@
 package hmm;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -10,61 +9,61 @@ public class OptimizedState extends State<OptimizedState>{
 
 	private MathContext mc=new MathContext(200,RoundingMode.HALF_EVEN);
 	
-	private HashMap<OptimizedState, BigDecimal> nextStateProbabilityMap=new HashMap<OptimizedState, BigDecimal>();
-	private HashMap<Word, BigDecimal> wordEmissionProbablilityMap=new HashMap<Word, BigDecimal>();
+	private HashMap<OptimizedState, BigDouble> nextStateProbabilityMap=new HashMap<OptimizedState, BigDouble>();
+	private HashMap<Word, BigDouble> wordEmissionProbablilityMap=new HashMap<Word, BigDouble>();
 	
 	public OptimizedState(String s) {
 		name=s;
 	}
 
-	public void setNextStateProbability(OptimizedState state, BigDecimal d){
+	public void setNextStateProbability(OptimizedState state, BigDouble d){
 		nextStateProbabilityMap.put(state, d);
 	}
 	
-	public void setWordEmissionProbability(Word word, BigDecimal d){
+	public void setWordEmissionProbability(Word word, BigDouble d){
 		wordEmissionProbablilityMap.put(word,d);
 	}
 	
 	@Override
-	public BigDecimal nextStateProbability(OptimizedState state) {
+	public BigDouble nextStateProbability(OptimizedState state) {
 		if (nextStateProbabilityMap.containsKey(state)){
 			return nextStateProbabilityMap.get(state);
 		}
-		return BigDecimal.ZERO;
+		return BigDouble.ZERO;
 	}
 
 	@Override
-	public BigDecimal wordEmittingProbability(Word word) {
+	public BigDouble wordEmittingProbability(Word word) {
 		if (wordEmissionProbablilityMap.containsKey(word)){
 			return wordEmissionProbablilityMap.get(word);
 		}
 		
-		return BigDecimal.ZERO;
+		return BigDouble.ZERO;
 	}
 
 	public void normalize() {
-		BigDecimal sum=BigDecimal.ZERO;
+		BigDouble sum=BigDouble.ZERO;
 		
 		// normalize transition probabilities
-		for (BigDecimal d: nextStateProbabilityMap.values()){
+		for (BigDouble d: nextStateProbabilityMap.values()){
 			sum=sum.add(d);
 		}
 		
-		if (sum.compareTo(BigDecimal.ZERO)==0) sum=BigDecimal.ONE;
+		if (sum.compareTo(BigDouble.ZERO)==0) sum=BigDouble.ONE;
 		
-		for (Entry<OptimizedState, BigDecimal> e: nextStateProbabilityMap.entrySet()){
-			e.setValue(e.getValue().divide(sum,mc));
+		for (Entry<OptimizedState, BigDouble> e: nextStateProbabilityMap.entrySet()){
+			e.setValue(e.getValue().divide(sum));
 		}
 		
 		// normalize word emission probabilities
-		sum=BigDecimal.ZERO;
-		for (BigDecimal d: wordEmissionProbablilityMap.values())
+		sum=BigDouble.ZERO;
+		for (BigDouble d: wordEmissionProbablilityMap.values())
 			sum=sum.add(d);
 		
-		if (sum.compareTo(BigDecimal.ZERO)==0) sum=BigDecimal.ONE;
+		if (sum.compareTo(BigDouble.ZERO)==0) sum=BigDouble.ONE;
 		
-		for (Entry<Word, BigDecimal> e: wordEmissionProbablilityMap.entrySet()){
-			e.setValue(e.getValue().divide(sum,mc));
+		for (Entry<Word, BigDouble> e: wordEmissionProbablilityMap.entrySet()){
+			e.setValue(e.getValue().divide(sum));
 		}
 		
 	}

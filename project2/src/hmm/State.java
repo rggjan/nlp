@@ -6,8 +6,12 @@ public abstract class State<T extends State> {
 
 	public String name;
 	
-	public abstract BigDecimal nextStateProbability(T state);
+	public abstract BigDouble nextStateProbability(T state);
 
-	public abstract BigDecimal wordEmittingProbability(Word word);
+	public abstract BigDouble wordEmittingProbability(Word word);
 
+	@Override
+	public String toString() {
+		return name;
+	}
 }

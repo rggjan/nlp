@@ -106,12 +106,12 @@ public class CountedState extends State<CountedState>{
 	}
 
 	@Override
-	public BigDecimal wordEmittingProbability(Word word) {
-		return new BigDecimal((double) wordCount(word)/(double)totalWordCount());
+	public BigDouble wordEmittingProbability(Word word) {
+		return new BigDouble((double) wordCount(word)/(double)totalWordCount());
 	}
 
 	@Override
-	public BigDecimal nextStateProbability(CountedState state) {
-		return new BigDecimal((double) nextStateCount(state)/(double)totalNextStateCount());
+	public BigDouble nextStateProbability(CountedState state) {
+		return new BigDouble((double) nextStateCount(state)/(double)totalNextStateCount());
 	}
 }

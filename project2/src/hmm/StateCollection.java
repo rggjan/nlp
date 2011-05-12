@@ -26,7 +26,7 @@ public abstract class StateCollection<T extends State> {
 	
 	protected abstract T createState(String s);
 
-	protected T getStateTraining(String s) {
+	public T getStateTraining(String s) {
 		if (s==null || s.equals(""))
 			throw new Error("invalid state name");
 	
@@ -50,7 +50,7 @@ public abstract class StateCollection<T extends State> {
 		return unknownState();
 	}
 
-	protected Word getWordTraining(String s) {
+	public Word getWordTraining(String s) {
 		// return existing word if available
 		if (words.containsKey(s)){
 			return words.get(s);
@@ -92,8 +92,8 @@ public abstract class StateCollection<T extends State> {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public BigDecimal calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
-		BigDecimal probability = BigDecimal.ONE;
+	public BigDouble calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
+		BigDouble probability = BigDouble.ONE;
 		T lastState = startState();
 	
 		for (String wordPair : sentence) {

@@ -2,6 +2,7 @@ package hmm;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
 public class Main {
@@ -11,8 +12,12 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		final boolean simple_texts = false;
+		final boolean simple_texts = true;
 
+		BigDouble n=BigDouble.valueOf(24.5,100000);
+		BigDouble m=new BigDouble(-3);
+		System.out.println(n.add(m));
+		
 		//exercise_1(simple_texts);
 		exercise_2(simple_texts);
 	}
@@ -25,7 +30,7 @@ public class Main {
 		if (simple_texts) {
 			parser.readText("data/train.txt");
 		} else {
-			for (int i=1; i<5; i++)
+			for (int i=1; i<2; i++)
 				parser.readText("data/train_" + i + ".pos");
 		}
 
@@ -40,9 +45,11 @@ public class Main {
 
 		final int stateCount = 5;
 
+		long start=System.currentTimeMillis();
 		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
+		System.out.println(System.currentTimeMillis()-start);
 		
-		System.out.println(hmm);
+		//System.out.println(hmm);
 		// Build unknown state collection
 		//StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
 

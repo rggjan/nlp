@@ -1,6 +1,5 @@
 package hmm;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.Random;
 
 public class UnsupervisedTrainingAlgorithm {
 	private static Random random=new Random(1);
-	private static MathContext mc=new MathContext(20,RoundingMode.HALF_EVEN);
 	public static OptimizedStateCollection train(ArrayList<ArrayList<String>> trainingSentenceStrings, int stateCount){
 		OptimizedStateCollection hmm=new OptimizedStateCollection();
 		hmm.states.remove(hmm.unknownState().name);
@@ -23,7 +21,7 @@ public class UnsupervisedTrainingAlgorithm {
 		// setup random state transistion probabilities
 		for (OptimizedState a: hmm.getStates()){
 			for (OptimizedState b: hmm.getStates()){
-				a.setNextStateProbability(b, BigDecimal.valueOf(random.nextDouble()));
+				a.setNextStateProbability(b, BigDouble.valueOf(random.nextDouble()));
 			}
 		}
 		
@@ -41,14 +39,14 @@ public class UnsupervisedTrainingAlgorithm {
 		// setup random word emission probabilities
 		for (OptimizedState a: hmm.getStates())
 			for (Word w: hmm.words.values())
-				a.setWordEmissionProbability(w, BigDecimal.valueOf(random.nextDouble()));
+				a.setWordEmissionProbability(w, BigDouble.valueOf(random.nextDouble()));
 		
 		// normalize all probabilitis
 		for (OptimizedState a: hmm.getStates())
 			a.normalize();
 		
-		BigDecimal oldProbability=BigDecimal.valueOf(-1);
-		BigDecimal probability=BigDecimal.ZERO;
+		BigDouble oldProbability=BigDouble.valueOf(-1);
+		BigDouble probability=BigDouble.ZERO;
 		
 		// optimization loop
 		do{
@@ -64,20 +62,20 @@ public class UnsupervisedTrainingAlgorithm {
 				alphas.add(alpha);
 				BackwardAlgorithm<OptimizedStateCollection, OptimizedState> beta = new BackwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm, list);
 				betas.add(beta);
-				BigDecimal a=alpha.getFinalProbability();
-				BigDecimal b=beta.getFinalProbability();
-				if (a.add(b).compareTo(BigDecimal.ZERO)!=0){ 
-					if ((a.subtract(b).abs().divide(a.add(b).abs(),mc).compareTo(BigDecimal.valueOf(1e-5))>0))
+				BigDouble a=alpha.getFinalProbability();
+				BigDouble b=beta.getFinalProbability();
+				if (a.add(b).compareTo(BigDouble.ZERO)!=0){ 
+					if ((a.subtract(b).abs().divide(a.add(b).abs()).compareTo(BigDouble.valueOf(1e-5))>0))
 						throw new Error("Alpha and Beta do not match");
 				}
 			}
 			
 			// calculate the probability of the input under the current HMM
-			probability=BigDecimal.ONE;
+			probability=BigDouble.ONE;
 			{
 				int i=0;
 				for (List<Word> list: trainingSentences){
-					probability=probability.multiply(alphas.get(i).getFinalProbability(),mc);
+					probability=probability.multiply(alphas.get(i).getFinalProbability());
 					i++;
 				}
 			}
@@ -86,8 +84,8 @@ public class UnsupervisedTrainingAlgorithm {
 			//System.out.println(hmm);
 			
 			// optimize while the probability of the output increases by at least 10 percent
-			if (oldProbability.multiply(BigDecimal.valueOf(1.1)).compareTo(probability)>0) return hmm;
-			
+			if (oldProbability.multiply(BigDouble.valueOf(1.1)).compareTo(probability)>0) return hmm;
+						
 			
 			oldProbability=probability;
 			
@@ -98,19 +96,19 @@ public class UnsupervisedTrainingAlgorithm {
 			for (OptimizedState a: hmm.getStates()){
 				if (a==hmm.endState()) continue;
 				OptimizedState newA=newHmm.getState(a.name);
-				BigDecimal denominator=BigDecimal.ZERO;
+				BigDouble denominator=BigDouble.ZERO;
 				for (OptimizedState b: hmm.getStates()){
 					if (b==hmm.startState()) continue;
 					OptimizedState newB=newHmm.getState(b.name);
 					
 					// calculate the numerator
-					BigDecimal numerator=BigDecimal.ZERO;
+					BigDouble numerator=BigDouble.ZERO;
 					int i=0;
 					for (List<Word> sentence: trainingSentences){
 						for( int t=-1; t<sentence.size(); t++){
-							BigDecimal d=
+							BigDouble d=
 								xi(t,sentence,a,b,alphas.get(i),betas.get(i),hmm)
-								.multiply(BigDecimal.valueOf(sentence.size())); //weight by sentence length
+								.multiply(BigDouble.valueOf(sentence.size())); //weight by sentence length
 							numerator=numerator.add(d);
 							denominator=denominator.add(d);
 						}
@@ -121,12 +119,12 @@ public class UnsupervisedTrainingAlgorithm {
 				
 				// normalize with the denominator
 				// this can only be done after iteration over all b's above
-				if (denominator.compareTo(BigDecimal.ZERO)==0) denominator=BigDecimal.ONE;
+				if (denominator.compareTo(BigDouble.ZERO)==0) denominator=BigDouble.ONE;
 				for (OptimizedState b: hmm.getStates()){
 					if (b==hmm.startState()) continue;
 					OptimizedState newB=newHmm.getState(b.name);
 					newA.setNextStateProbability(newB,
-							newA.nextStateProbability(newB).divide(denominator,mc));
+							newA.nextStateProbability(newB).divide(denominator));
 				}
 			}
 			
@@ -137,7 +135,7 @@ public class UnsupervisedTrainingAlgorithm {
 				OptimizedState newA=newHmm.getState(a.name);
 				
 				// calculate the denominator
-				BigDecimal denominator=BigDecimal.ZERO;
+				BigDouble denominator=BigDouble.ZERO;
 				{
 					int i=0;
 					for (List<Word> sentence: trainingSentences){
@@ -145,17 +143,17 @@ public class UnsupervisedTrainingAlgorithm {
 						for( Word w: sentence){
 							denominator=denominator.add(
 								gamma(t,a,alphas.get(i),betas.get(i))
-								.multiply(BigDecimal.valueOf(sentence.size()))); //weight by sentence length
+								.multiply(BigDouble.valueOf(sentence.size()))); //weight by sentence length
 							t++;
 						}
 						i++;
 					}
 				}
-				if (denominator.compareTo(BigDecimal.ZERO)==0) denominator=BigDecimal.ONE;
+				if (denominator.compareTo(BigDouble.ZERO)==0) denominator=BigDouble.ONE;
 				
 				// set the probabilities for all words
 				for (Word word: hmm.words.values()){
-					BigDecimal numerator=BigDecimal.ZERO;
+					BigDouble numerator=BigDouble.ZERO;
 					int i=0;
 					for (List<Word> sentence: trainingSentences){
 						int t=0;
@@ -163,17 +161,17 @@ public class UnsupervisedTrainingAlgorithm {
 							if (w==word)
 								numerator=numerator.add(
 										gamma(t,a,alphas.get(i),betas.get(i))
-										.multiply(BigDecimal.valueOf(sentence.size()))); //weighten by sentence length
+										.multiply(BigDouble.valueOf(sentence.size()))); //weighten by sentence length
 							t++;
 						}
 						i++;
 					}
-					newA.setWordEmissionProbability(word, numerator.divide(denominator,mc));
+					newA.setWordEmissionProbability(word, numerator.divide(denominator));
 				}
 				
 			}
 			hmm=newHmm;
-			
+			return hmm;
 		} while (true); // return statement is located above
 		
 		// never reached
@@ -194,15 +192,15 @@ public class UnsupervisedTrainingAlgorithm {
 	 * @param hmm 
 	 * @return
 	 */
-	private static BigDecimal xi(int t, List<Word> sentence, OptimizedState a, OptimizedState b, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta, OptimizedStateCollection hmm){
-		BigDecimal 
+	private static BigDouble xi(int t, List<Word> sentence, OptimizedState a, OptimizedState b, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta, OptimizedStateCollection hmm){
+		BigDouble 
 			result=alpha.get(t, a);
 			result=result.multiply(a.nextStateProbability(b));
 			if ((t+1)<sentence.size())
 				result=result.multiply(b.wordEmittingProbability(sentence.get(t+1)));
 			result=result.multiply(beta.get(t+1,b));
-			if (alpha.getFinalProbability().compareTo(BigDecimal.ZERO)!=0)
-				result=result.divide(alpha.getFinalProbability(),mc);
+			if (alpha.getFinalProbability().compareTo(BigDouble.ZERO)!=0)
+				result=result.divide(alpha.getFinalProbability());
 		return result;
 	}
 	
@@ -216,11 +214,11 @@ public class UnsupervisedTrainingAlgorithm {
 	 * @param beta
 	 * @return
 	 */
-	private static BigDecimal gamma(int t, OptimizedState a, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta){
+	private static BigDouble gamma(int t, OptimizedState a, ForwardAlgorithm<OptimizedStateCollection,OptimizedState> alpha, BackwardAlgorithm<OptimizedStateCollection,OptimizedState> beta){
 		return
 			alpha.get(t,a)
 			.multiply(beta.get(t,a))
-			.divide(alpha.getFinalProbability(),mc);
+			.divide(alpha.getFinalProbability());
 			
 	}
 	private static OptimizedStateCollection copyStateCollection(OptimizedStateCollection other){
