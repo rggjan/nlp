@@ -13,9 +13,10 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		final boolean simple_texts = false;
 
-		BigDouble n=BigDouble.valueOf(24.5,100000);
-		BigDouble m=new BigDouble(-3);
-		System.out.println(n.add(m));
+		/*
+		 * BigDouble n=BigDouble.valueOf(24.5,100000); BigDouble m=new
+		 * BigDouble(-3); System.out.println(n.add(m));
+		 */
 
 		// exercise_1(simple_texts);
 		exercise_2(simple_texts);
@@ -26,6 +27,7 @@ public class Main {
 		TextParser parser = new TextParser();
 
 		// read training data
+		System.out.println("Reading training texts...");
 		if (simple_texts) {
 			parser.readText("data/train.txt");
 		} else {
@@ -44,9 +46,15 @@ public class Main {
 
 		final int stateCount = 10;
 
-		long start=System.currentTimeMillis();
+		System.out.println("Starting Training...");
+		// long start=System.currentTimeMillis();
 		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
-		System.out.println(System.currentTimeMillis()-start);
+		// System.out.println(System.currentTimeMillis()-start);
+
+		System.out
+		.println("Finished training! (Less than 10 percent improvement)");
+		System.out.println("===========================================");
+		System.out.println("Trained HMM with " + stateCount + " states:");
 
 		// Print the HMM we got
 		System.out.println(hmm);
@@ -56,20 +64,40 @@ public class Main {
 		if (simple_texts) {
 			parser.readText("data/test.txt");
 		} else {
-			parser.readText("data/test_1.pos");
+			parser.readText("data/train_1.pos");
 		}
 		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 
-		// iterate over the test text and print the probabilities of
-		// the test sentences
-		/*
-		 * for (ArrayList<String> sentence : sentenceList) {
-		 * System.out.println("==================="); for (String word :
-		 * sentence) { System.out.print(word + " "); } System.out.println();
-		 * 
-		 * System.out .println("=> " +
-		 * hmm.calculateProbabilityofSentenceWithStates(sentence)); }
-		 */
+		// iterate over the test text and print the best tagging,
+		// along with the probability
+
+		System.out.println("==========================================");
+		System.out.println("Training sentences, real and trained tags:");
+		System.out.println("==========================================");
+
+		for (ArrayList<String> sentence : sentenceList) {
+			System.out.println("===================");
+			ArrayList<String> notTagSentence = new ArrayList<String>();
+
+			for (String word : sentence) {
+				String[] splitting = word.split("/");
+				String s = splitting[0];
+				System.out.print(word + " ");
+				notTagSentence.add(s);
+			}
+			System.out.println();
+
+			Viterbi<OptimizedStateCollection, OptimizedState> viterbi = Viterbi
+			.viterbi(hmm, notTagSentence);
+
+			for (int i = 0; i < notTagSentence.size(); i++) {
+				String goodTag = viterbi.getStates().get(i).name;
+				System.out.printf("%s/%s ", notTagSentence.get(i), goodTag);
+			}
+			System.out.println();
+
+			System.out.println("Probability: " + viterbi.getProbability());
+		}
 	}
 
 	private static void exercise_1(final boolean simple_texts)

@@ -50,6 +50,8 @@ public class UnsupervisedTrainingAlgorithm {
 		BigDouble oldProbability=BigDouble.valueOf(-1);
 		BigDouble probability=BigDouble.ZERO;
 
+		int iteration_number = 1;
+
 		// optimization loop
 		do{
 			// create forward and backward algorithms
@@ -83,7 +85,17 @@ public class UnsupervisedTrainingAlgorithm {
 				}
 			}
 
-			System.out.println(probability);
+			System.out
+			.println("Finished iteration " + iteration_number
+					+ ", probability = "
+					+ probability);
+
+			iteration_number += 1;
+
+			if (oldProbability.doubleValue() != BigDouble.valueOf(-1)
+					.doubleValue())
+				System.out.println("Improvement = "
+						+ probability.divide(oldProbability).toString());
 			//System.out.println(hmm);
 
 			// optimize while the probability of the output increases by at least 10 percent
