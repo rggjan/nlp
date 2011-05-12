@@ -19,11 +19,11 @@ public class OptimizedState extends State<OptimizedState>{
 	public void setNextStateProbability(OptimizedState state, BigDouble d){
 		nextStateProbabilityMap.put(state, d);
 	}
-	
+
 	public void setWordEmissionProbability(Word word, BigDouble d){
 		wordEmissionProbablilityMap.put(word,d);
 	}
-	
+
 	@Override
 	public BigDouble nextStateProbability(OptimizedState state) {
 		if (nextStateProbabilityMap.containsKey(state)){
@@ -43,28 +43,28 @@ public class OptimizedState extends State<OptimizedState>{
 
 	public void normalize() {
 		BigDouble sum=BigDouble.ZERO;
-		
+
 		// normalize transition probabilities
 		for (BigDouble d: nextStateProbabilityMap.values()){
 			sum=sum.add(d);
 		}
-		
+
 		if (sum.compareTo(BigDouble.ZERO)==0) sum=BigDouble.ONE;
-		
+
 		for (Entry<OptimizedState, BigDouble> e: nextStateProbabilityMap.entrySet()){
 			e.setValue(e.getValue().divide(sum));
 		}
-		
+
 		// normalize word emission probabilities
 		sum=BigDouble.ZERO;
 		for (BigDouble d: wordEmissionProbablilityMap.values())
 			sum=sum.add(d);
-		
+
 		if (sum.compareTo(BigDouble.ZERO)==0) sum=BigDouble.ONE;
-		
+
 		for (Entry<Word, BigDouble> e: wordEmissionProbablilityMap.entrySet()){
 			e.setValue(e.getValue().divide(sum));
 		}
-		
+
 	}
 }
