@@ -88,7 +88,7 @@ public class UnsupervisedTrainingAlgorithm {
 
 			// optimize while the probability of the output increases by at least 10 percent
 			if (oldProbability.multiply(BigDouble.valueOf(1.1)).compareTo(
-					probability) > 0 || true)
+					probability) > 0)
 				return hmm;
 
 
