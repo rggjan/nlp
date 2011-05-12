@@ -16,8 +16,8 @@ public class Main {
 		BigDouble n=BigDouble.valueOf(24.5,100000);
 		BigDouble m=new BigDouble(-3);
 		System.out.println(n.add(m));
-		
-		//exercise_1(simple_texts);
+
+		// exercise_1(simple_texts);
 		exercise_2(simple_texts);
 	}
 
@@ -47,22 +47,29 @@ public class Main {
 		long start=System.currentTimeMillis();
 		OptimizedStateCollection hmm=UnsupervisedTrainingAlgorithm.train(parser.getSentences(), stateCount);
 		System.out.println(System.currentTimeMillis()-start);
-		
-		System.out.println(hmm);
-		// Build unknown state collection
-		//StateCollection hiddenCollection = new StateCollection(numStates, trainingWords);
 
-		//hiddenCollection = hiddenCollection
-		//		.reEstimateProbabilites(trainingList);
+		// Print the HMM we got
+		System.out.println(hmm);
 
 		// read the test text
-		/*parser = new TextParser();
+		parser = new TextParser();
 		if (simple_texts) {
 			parser.readText("data/test.txt");
 		} else {
 			parser.readText("data/test_1.pos");
 		}
-		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();*/
+		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
+
+		// iterate over the test text and print the probabilities of
+		// the test sentences
+		/*
+		 * for (ArrayList<String> sentence : sentenceList) {
+		 * System.out.println("==================="); for (String word :
+		 * sentence) { System.out.print(word + " "); } System.out.println();
+		 * 
+		 * System.out .println("=> " +
+		 * hmm.calculateProbabilityofSentenceWithStates(sentence)); }
+		 */
 	}
 
 	private static void exercise_1(final boolean simple_texts)
@@ -90,7 +97,7 @@ public class Main {
 		}
 		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 
-		// iterate over the test text and print the probatilities of
+		// iterate over the test text and print the probabilities of
 		// the test sentences
 		for (ArrayList<String> sentence : sentenceList) {
 			System.out.println("===================");
