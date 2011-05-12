@@ -1,17 +1,15 @@
 package hmm;
 
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class OptimizedState extends State<OptimizedState>{
 
-	private MathContext mc=new MathContext(200,RoundingMode.HALF_EVEN);
-	
-	private HashMap<OptimizedState, BigDouble> nextStateProbabilityMap=new HashMap<OptimizedState, BigDouble>();
-	private HashMap<Word, BigDouble> wordEmissionProbablilityMap=new HashMap<Word, BigDouble>();
-	
+	// private final MathContext mc=new MathContext(200,RoundingMode.HALF_EVEN);
+
+	private final HashMap<OptimizedState, BigDouble> nextStateProbabilityMap=new HashMap<OptimizedState, BigDouble>();
+	private final HashMap<Word, BigDouble> wordEmissionProbablilityMap=new HashMap<Word, BigDouble>();
+
 	public OptimizedState(String s) {
 		name=s;
 	}
