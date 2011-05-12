@@ -129,30 +129,43 @@ public abstract class StateCollection<T extends State> {
 		for (T row: states.values()){
 			// print row name
 			builder.append(String.format("%s\t",row.name));
-			
+
 			// output all values
 			for (T column: states.values()){
-				builder.append(String.format("%.2f\t",row.nextStateProbability(column).doubleValue()));
+				builder.append(String.format("%5.2f%%\t", row
+						.nextStateProbability(column).doubleValue() * 100));
 			}
 			builder.append(String.format("\n"));
 		}
 		builder.append(String.format("\n"));
-	
+
 		// print emission matrix
+		// Get longest word
+		int max = 0;
+		for (Word column : words.values()) {
+			if (column.name.length() > max)
+				max = column.name.length();
+		}
+
+		max += 1;
+
 		builder.append(String.format("\t"));
 		for (Word column: words.values()){
-			builder.append(String.format("%s\t",column.name));
+			builder.append(String.format(String.format("%%%ds", max),
+					column.name));
 		}
 		builder.append(String.format("\n"));
-	
+
 		for (T row: states.values()){
-			builder.append(String.format("%s\t",row.name));
+			builder.append(String.format("%s\t", row.name));
 			for (Word column: words.values()){
-				builder.append(String.format("%.2f\t",row.wordEmittingProbability(column).doubleValue()));
+				builder.append(String.format(String
+.format("%%%d.2f%%%%",
+						max - 1), row
+						.wordEmittingProbability(column).doubleValue() * 100));
 			}
 			builder.append(String.format("\n"));
 		}
-	
 
 		return builder.toString();
 	}
