@@ -1,7 +1,5 @@
 package hmm;
 
-import java.math.BigDecimal;
-
 public abstract class State<T extends State> {
 
 	public String name;

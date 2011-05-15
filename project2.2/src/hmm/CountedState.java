@@ -1,6 +1,5 @@
 package hmm;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 
 /**
@@ -12,7 +11,9 @@ public class CountedState extends State<CountedState>{
 	private final HashMap<Word, Integer> emittedWordCounts = new HashMap<Word, Integer>();
 	private final HashMap<CountedState, Integer> nextStateCounts = new HashMap<CountedState, Integer>();
 	StateCollection<CountedState> stateCollection;
-	public CountedState(String name_, StateCollection _stateCollection) {
+
+	public CountedState(String name_,
+			StateCollection<CountedState> _stateCollection) {
 		name = name_;
 		stateCollection=_stateCollection;
 	}
@@ -35,7 +36,7 @@ public class CountedState extends State<CountedState>{
 			nextStateCounts.put(nextState, 1);
 		}
 		else{
-			// inclrease the nuber of times the state has been seen
+			// increase the number of times the state has been seen
 			nextStateCounts.put(nextState, nextStateCounts.get(nextState) + 1);
 		}
 	}
@@ -53,11 +54,11 @@ public class CountedState extends State<CountedState>{
 	public int wordCount(Word word){
 		// laplacian normalization (each word has been seen at least once)
 		int result=1;
-		
+
 		// add the number of words acutally seen
 		if (emittedWordCounts.containsKey(word))
 			result+=emittedWordCounts.get(word);
-		
+
 		return result;
 	}
 
@@ -82,7 +83,7 @@ public class CountedState extends State<CountedState>{
 	public int nextStateCount(CountedState state){
 		// laplacian normalization, each state has been seen at least once
 		int result=1;
-		
+
 		// add the true state count
 		if (nextStateCounts.containsKey(state)){
 			result+=nextStateCounts.get(state);

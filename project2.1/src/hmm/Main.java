@@ -34,16 +34,21 @@ public class Main {
 		}
 		ArrayList<ArrayList<String>> sentenceList = parser.getSentences();
 
+		System.out.println("===========================");
+		System.out.println("Probabilities of sentences:");
+		System.out.println("===========================");
+
 		// iterate over the test text and print the probabilities of
 		// the test sentences
 		for (ArrayList<String> sentence : sentenceList) {
-			System.out.println("===================");
 			for (String word : sentence) {
 				System.out.print(word + " ");
 			}
 			System.out.println();
 
 			System.out.println("=> " + collection.calculateProbabilityofSentenceWithStates(sentence));
+
+			System.out.println("===================");
 		}
 
 		// iterate over the test text and print the best tagging,
@@ -51,8 +56,15 @@ public class Main {
 		int globalCorrect = 0;
 		int globalTotal = 0;
 
+		System.out.println();
+		System.out
+		.println("=======================================================");
+		System.out
+		.println("Guessed tags, probability and ground truth correctness:");
+		System.out
+		.println("=======================================================");
+
 		for (ArrayList<String> sentence : sentenceList) {
-			System.out.println("===================");
 			ArrayList<String> notTagSentence=new ArrayList<String>();
 			ArrayList<String> tagOnlySentence=new ArrayList<String>();
 
@@ -85,9 +97,10 @@ public class Main {
 			System.out.println("Correctness: " + numCorrect * 100.0 / numTotal + "%");
 			globalCorrect += numCorrect;
 			globalTotal += numTotal;
+
+			System.out.println("===================");
 		}
 
-		System.out.println("==========================================");
 		System.out.println("==========================================");
 
 		System.out.println("Total Correctness: " + globalCorrect * 100.0 / globalTotal + "%");

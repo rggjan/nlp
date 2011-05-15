@@ -1,8 +1,5 @@
 package hmm;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
 
 /**
  * A collection of states
@@ -11,8 +8,6 @@ import java.util.Random;
  *
  */
 public class CountedStateCollection extends StateCollection<CountedState> {
-
-	private Random random;
 
 	public CountedStateCollection() {
 	}
@@ -143,6 +138,7 @@ public class CountedStateCollection extends StateCollection<CountedState> {
 
 
 
+	@Override
 	public Word getWord(String s) {
 		return null;
 	}

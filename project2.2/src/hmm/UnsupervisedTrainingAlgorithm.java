@@ -15,7 +15,7 @@ public class UnsupervisedTrainingAlgorithm {
 			hmm.getStateTraining("s"+i);
 		}
 
-		// setup random state transistion probabilities
+		// setup random state transition probabilities
 		for (OptimizedState a: hmm.getStates()){
 			for (OptimizedState b: hmm.getStates()){
 				a.setNextStateProbability(b, BigDouble.valueOf(random.nextDouble()));

@@ -2,16 +2,12 @@ package hmm;
 
 import hmm.CachedFunction.IFunction;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.List;
 
 public class BackwardAlgorithm<TStateCollection extends StateCollection<TState>,TState extends State> {
-	private static MathContext mc=new MathContext(10,RoundingMode.HALF_EVEN);
-	private CachedFunction<Integer, TState, BigDouble> beta;
-	private TStateCollection hmm;
-	private List<Word> output;
+	private final CachedFunction<Integer, TState, BigDouble> beta;
+	private final TStateCollection hmm;
+	private final List<Word> output;
 	
 	public BigDouble get(int t, TState state){
 		return beta.get(t, state);
