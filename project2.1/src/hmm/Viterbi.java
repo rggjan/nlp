@@ -2,31 +2,30 @@ package hmm;
 
 import java.util.*;
 
-public class Viterbi<TStateCollection extends StateCollection<TState>,TState extends State> {
+public class Viterbi {
 	
-	private CachedFunction<Integer,TState,BigDouble> v;
-	private CachedFunction<Integer,TState,TState> d;
+	private Cache<Integer,State,Double> v;
+	private Cache<Integer,State,State> d;
 	
-	// list of the best states found so far
-	private List<TState> states=new LinkedList<TState>();
-	private BigDouble probability;
+	private List<State> states=new LinkedList<State>();
+	private double probability;
 	
-	private Viterbi(final TStateCollection hmm, final List<String> output) {
+	private Viterbi(final StateCollection hmm, final List<String> output) {
 		// create cached method for v
 		v=createV(hmm, output);
 		// create cached method for d
 		d=createD(hmm, output);
 		
-		probability=BigDouble.valueOf(-1);
+		probability=-1;
 		
-		TState bestLast=null;
-		for (TState prevState:  hmm.getStates()){
+		State bestLast=null;
+		for (State prevState:  hmm.states.values()){
 			if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
 			
-			BigDouble f=	
+			double f=	
 				v.get(output.size()-1, prevState)
-				.multiply(prevState.nextStateProbability(hmm.endState()));
-			if (f.compareTo(probability)>0) {
+				*prevState.nextStateProbability(hmm.endState());
+			if (f>probability) {
 				probability=f;
 				bestLast=prevState;
 			}
@@ -36,32 +35,32 @@ public class Viterbi<TStateCollection extends StateCollection<TState>,TState ext
 	}
 
 
-	private void fillStates(int t,TState bestLast) {
+	private void fillStates(int t,State state) {
 		if (t>0){
-			fillStates(t-1, d.get(t, bestLast));
+			fillStates(t-1, d.get(t, state));
 		}
-		states.add(bestLast);
+		states.add(state);
 	}
 
 
-	private CachedFunction<Integer, TState, TState> createD(final TStateCollection hmm,
+	private Cache<Integer, State, State> createD(final StateCollection hmm,
 			final List<String> output) {
-		return new CachedFunction<Integer, TState, TState>(new CachedFunction.IFunction<Integer, TState, TState>() {
+		return new Cache<Integer, State, State>(new Cache.CachedFunction<Integer, State, State>() {
 
 			@Override
-			public TState evaluate(Integer t, TState state) {
+			public State evaluate(Integer t, State state) {
 				if (t==0){
 					return hmm.startState();
 				}
-				BigDouble result=BigDouble.valueOf(-1);
-				TState bestPrev=null;
-				for (TState prevState:  hmm.getStates()){
+				double result=-1;
+				State bestPrev=null;
+				for (State prevState:  hmm.states.values()){
 					if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
-					BigDouble f=
+					double f=
 						v.get(t-1, prevState)
-						.multiply(prevState.nextStateProbability(state))
-						.multiply(state.wordEmittingProbability(hmm.getWord(output.get(t))));
-					if (f.compareTo(result)>0) {
+						*prevState.nextStateProbability(state)
+						*state.wordEmittingProbability(hmm.getWord(output.get(t)));
+					if (f>result) {
 						result=f;
 						bestPrev=prevState;
 					}
@@ -72,25 +71,25 @@ public class Viterbi<TStateCollection extends StateCollection<TState>,TState ext
 	}
 
 
-	private CachedFunction<Integer, TState, BigDouble> createV(final TStateCollection hmm,
+	private Cache<Integer, State, Double> createV(final StateCollection hmm,
 			final List<String> output) {
-		return new CachedFunction<Integer, TState, BigDouble>(new CachedFunction.IFunction<Integer, TState, BigDouble>() {
+		return new Cache<Integer, State, Double>(new Cache.CachedFunction<Integer, State, Double>() {
 
 			@Override
-			public BigDouble evaluate(Integer t, TState state) {
+			public Double evaluate(Integer t, State state) {
 				if (t==0){
 					return 
 						hmm.startState().nextStateProbability(state)
-						.multiply(state.wordEmittingProbability(hmm.getWord(output.get(t))));
+						*state.wordEmittingProbability(hmm.getWord(output.get(t)));
 				}
-				BigDouble result=BigDouble.ZERO;
-				for (TState prevState:  hmm.getStates()){
+				double result=0;
+				for (State prevState:  hmm.states.values()){
 					if (prevState==hmm.startState() || prevState==hmm.endState()) continue;
-					BigDouble f=
+					double f=
 						v.get(t-1, prevState)
-						.multiply(prevState.nextStateProbability(state))
-						.multiply(state.wordEmittingProbability(hmm.getWord(output.get(t))));
-					if (f.compareTo(result)>0) result=f;
+						*prevState.nextStateProbability(state)
+						*state.wordEmittingProbability(hmm.getWord(output.get(t)));
+					if (f>result) result=f;
 				}
 				return result;
 			}
@@ -98,17 +97,16 @@ public class Viterbi<TStateCollection extends StateCollection<TState>,TState ext
 	}
 
 	
-	public static <TStateCollection extends StateCollection<TState>,TState extends State>
-		Viterbi<TStateCollection,TState> viterbi(TStateCollection hmm, List<String> output){
-		return new Viterbi<TStateCollection,TState>(hmm,output);
+	public static Viterbi viterbi(StateCollection hmm, List<String> output){
+		return new Viterbi(hmm,output);
 	}
 
 
-	public List<TState> getStates() {
+	public List<State> getStates() {
 		return states;
 	}
 
-	public BigDouble getProbability() {
+	public double getProbability() {
 		return probability;
 	}
 }

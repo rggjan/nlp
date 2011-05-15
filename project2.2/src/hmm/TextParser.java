@@ -72,8 +72,8 @@ public class TextParser {
 	 * Creates a state collection from the text read.
 	 * @return
 	 */
-	public StateCollection getStateCollection() {
-		StateCollection tagCollection = new StateCollection();
+	public CountedStateCollection getStateCollection() {
+		CountedStateCollection tagCollection = new CountedStateCollection();
 		
 		for (String sentence : rawSentences) {
 			String previous_tag = tagCollection.startState().name;

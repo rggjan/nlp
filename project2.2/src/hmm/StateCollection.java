@@ -1,103 +1,86 @@
 package hmm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
-public class StateCollection {
-	
+public abstract class StateCollection<T extends State> {
 	private boolean isFrozen;
-	public HashMap<String, State> states=new HashMap<String, State>();
-	public HashMap<String, Word> words=new HashMap<String, Word>();
-	
-	private State getStateTraining(String s){
-		if (s==null || s.equals(""))
-			throw new Error("invalid state name");
-		
-		// return existing state if available
-		if (states.containsKey(s)){
-			return states.get(s);
-		}
-		
-		// create new state
-		State result=new State(s,this);
-		states.put(s,result);
-		return result;
-	}
-	
-	public State getState(String s){
-		// return existing state if available
-		if (states.containsKey(s)){
-			return states.get(s);
-		}
-		
-		return unknownState();
-	}
-	
-	private Word getWordTraining(String s){
-		// return existing word if available
-		if (words.containsKey(s)){
-			return words.get(s);
-		}
-		
-		// create new word
-		Word result=new Word(s);
-		words.put(s,result);
-		return result;
-	}
-	
-	
-	public Word getWord(String s){
-		// return existing word if available
-		if (words.containsKey(s)){
-			return words.get(s);
-		}
-		
-		return unknownWord();
-	}
-	
-	public State startState() {
-		return getStateTraining("<start>");
-	}
-	
-	public State endState() {
-		return getStateTraining("<end>");
-	}
-	
-	public State unknownState() {
-		return getStateTraining("<unk>");
-	}
-	
-	public Word unknownWord(){
-		return getWordTraining("<unk>");
-	}
-	
-	public StateCollection() {
+	public HashMap<String, T> states = new HashMap<String, T>();
+	public HashMap<String, Word> words = new HashMap<String, Word>();
+
+	public StateCollection(){
 		// crate start and end state
 		startState();
 		endState();
 		unknownState();
 	}
 
-	public void addStateTansitionObservation(String wordString, String stateString, String previousStateString) {
-		if (isFrozen()) throw new Error();
-		State previousState;
-		State state;
-		Word word;
-		
-		// load states
-		previousState = getStateTraining(previousStateString);
-		state = getStateTraining(stateString);
-		
-		// load word
-		word=getWordTraining(wordString);
-		
-		state.addWordEmissionObservation(word);
-		previousState.addStateTransitionObservation(state);
+	public Collection<T> getStates() {
+		return states.values();
 	}
 
-	public void addFinalStateTransitionObservation(String previousState) {
-		if (isFrozen()) throw new Error();
-		getStateTraining(previousState).addStateTransitionObservation(endState());
+	protected abstract T createState(String s);
+
+	public T getStateTraining(String s) {
+		if (s==null || s.equals(""))
+			throw new Error("invalid state name");
+
+		// return existing state if available
+		if (states.containsKey(s)){
+			return states.get(s);
+		}
+
+		// create new state
+		T result=createState(s);
+		states.put(s,result);
+		return result;
+	}
+
+	public T getState(String s) {
+		// return existing state if available
+		if (states.containsKey(s)){
+			return states.get(s);
+		}
+
+		return unknownState();
+	}
+
+	public Word getWordTraining(String s) {
+		// return existing word if available
+		if (words.containsKey(s)){
+			return words.get(s);
+		}
+
+		// create new word
+		Word result=new Word(s);
+		words.put(s,result);
+		return result;
+	}
+
+	public Word getWord(String s) {
+		// return existing word if available
+		if (words.containsKey(s)){
+			return words.get(s);
+		}
+
+		return unknownWord();
+	}
+
+	public T startState() {
+		return getStateTraining("<start>");
+	}
+
+	public T endState() {
+		return getStateTraining("<end>");
+	}
+
+	public T unknownState() {
+		return getStateTraining("<unk>");
+	}
+
+	public Word unknownWord() {
+		return getWordTraining("<unk>");
 	}
 
 	/**
@@ -105,66 +88,85 @@ public class StateCollection {
 	 * @param sentence word/tag pairs which make up the sentence
 	 * @return
 	 */
-	public double calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
-		double probability = 1;
-		State lastState = startState();
-		
+	public BigDouble calculateProbabilityofSentenceWithStates(ArrayList<String> sentence) {
+		BigDouble probability = BigDouble.ONE;
+		T lastState = startState();
+
 		for (String wordPair : sentence) {
 			String[] splitting = wordPair.split("/");
 			String wordString = splitting[0];
 			String stateString = splitting[1];
 
 			Word word=getWord(wordString);
-			State state=getState(stateString);
-			
+			T state=getState(stateString);
+	
 			// Multiply with tag-to-tag probability
-			probability *= lastState.nextStateProbability(state);
+			probability=probability.multiply(lastState.nextStateProbability(state));
 			// Multiply with tag-to-word probability
-			probability *= state.wordEmittingProbability(word);
-			
+			probability=probability.multiply(state.wordEmittingProbability(word));
+
 			lastState = state;
 		}
-		
+
 		// Multiply with final-tag probability
-		probability *= lastState.nextStateProbability(unknownState());
+		probability=probability.multiply(lastState.nextStateProbability(unknownState()));
 		return probability;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder=new StringBuilder();
-		
+
 		// print transition matrix
+
+		// print top row
 		builder.append(String.format("\t"));
-		for (State column: states.values()){
+		for (T column: states.values()){
 			builder.append(String.format("%s\t",column.name));
 		}
 		builder.append(String.format("\n"));
-		
-		for (State row: states.values()){
+
+		for (T row: states.values()){
+			// print row name
 			builder.append(String.format("%s\t",row.name));
-			for (State column: states.values()){
-				builder.append(String.format("%.2f\t",row.nextStateProbability(column)));
+
+			// output all values
+			for (T column: states.values()){
+				builder.append(String.format("%5.2f%%\t", row
+						.nextStateProbability(column).doubleValue() * 100));
 			}
 			builder.append(String.format("\n"));
 		}
 		builder.append(String.format("\n"));
-		
+
 		// print emission matrix
+		// Get longest word
+		int max = 0;
+		for (Word column : words.values()) {
+			if (column.name.length() > max)
+				max = column.name.length();
+		}
+
+		max += 1;
+
 		builder.append(String.format("\t"));
 		for (Word column: words.values()){
-			builder.append(String.format("%s\t",column.name));
+			builder.append(String.format(String.format("%%%ds", max),
+					column.name));
 		}
 		builder.append(String.format("\n"));
-		
-		for (State row: states.values()){
-			builder.append(String.format("%s\t",row.name));
+
+		for (T row: states.values()){
+			builder.append(String.format("%s\t", row.name));
 			for (Word column: words.values()){
-				builder.append(String.format("%.2f\t",row.wordEmittingProbability(column)));
+				builder.append(String.format(String
+.format("%%%d.2f%%%%",
+						max - 1), row
+						.wordEmittingProbability(column).doubleValue() * 100));
 			}
 			builder.append(String.format("\n"));
 		}
-		
+
 		return builder.toString();
 	}
 
@@ -175,4 +177,5 @@ public class StateCollection {
 	public boolean isFrozen() {
 		return isFrozen;
 	}
+
 }
