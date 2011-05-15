@@ -2,7 +2,9 @@
 
 This is the code for a Class Project of the "Introduction to Natural Language Processing" cource at ETH Zuerich
 
-# How does it work
+# Exercise 1
+
+## How does it work
 We built a little DOM. A "Word" consists of multiple "Splittings". A "Splitting" has a "WordPart" in the role
 prefix, stem and suffix
 
@@ -111,3 +113,35 @@ We see, the weight is proportional to the number of other wordparts with the sam
 to the number of times it is seen multiplied by the number of different wordparts with the same length.
 
 In the end, this gave us quite good results, so thats the solution that is implemented right now.
+
+# Exercise 2.1
+
+## Classes description
+
+We read the text, splitting it according to "=====", in the TextParser. All the other processing, until we have just words, sentences and tags, are also done in this class.
+
+Next, the most important classes are the "State" and "StateCollection" classes. "State" is basically one of our hidden Markov states, where you can add and remove empirical word counts and transition counts, and then read the probability counts out of it.
+
+The "StateCollection" is is then the whole hidden Markov Model, with many States and a function to calculate the probability of a sentence under this model.
+
+Finally, in the "Viterbi" Class, we implemented our "Viterbi" Algorithm. However, we didn't do that directly with a dynamic programming table, but recursively with a cache, what should give us about the same performance.
+
+## Results
+
+We can read all the 50 training files and then calculate the probabilities of all the sentences in a test file in a few seconds. Using all the training files, we then get quite good results and an overall correctness of about 76%.
+
+We can also clearly see how the correctness gets better, the more training data we have. To show this, here a list of correctness for a certain test file depending on the number of training files:
+
+| # Test files | Correctness |
+|:-----------|------------:|
+| 1 | 47.0 % |
+| 2 | 53.8 % |
+| 4 | 59.4 % | 
+| 8 | 64.8 % |
+| 16 | 69.3 % |
+| 32 | 74.0 % |
+| 50 | 76.8 % |
+
+When we look at the table, we can see that doubling the test data gives us roughly 5% Correctness gain. That means, we need to exponentially increase the training data to get a linear increase in correctness.
+
+# Exercise 2.2

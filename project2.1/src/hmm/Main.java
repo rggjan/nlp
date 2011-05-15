@@ -18,7 +18,7 @@ public class Main {
 		if (simple_texts) {
 			parser.readText("data/train.txt");
 		} else {
-			for (int i=1; i<50; i++)
+			for (int i = 1; i < 51; i++)
 				parser.readText("data/train_" + i + ".pos");
 		}
 
