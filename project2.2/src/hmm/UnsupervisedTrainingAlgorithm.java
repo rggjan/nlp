@@ -61,7 +61,6 @@ public class UnsupervisedTrainingAlgorithm {
 			ArrayList<BackwardAlgorithm<OptimizedStateCollection, OptimizedState>>
 			betas=new ArrayList<BackwardAlgorithm<OptimizedStateCollection,OptimizedState>>();
 
-			//System.out.print(hmm);
 			for (List<Word> list: trainingSentences){
 				ForwardAlgorithm<OptimizedStateCollection, OptimizedState> alpha = new ForwardAlgorithm<OptimizedStateCollection, OptimizedState>(hmm,list);
 				alphas.add(alpha);
