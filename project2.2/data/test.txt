@@ -1,0 +1,5 @@
+===================
+
+The/A dog/C with/A the/A man/C with/B the/C dog/B
+
+===================
