@@ -145,3 +145,14 @@ We can also clearly see how the correctness gets better, the more training data 
 When we look at the table, we can see that doubling the test data gives us roughly 5% Correctness gain. That means, we need to exponentially increase the training data to get a linear increase in correctness.
 
 # Exercise 2.2
+
+## Classes description
+
+The basic classes in the second exercise are the same as for the first part of exercise 2. However, some new classes were added and some were adapted to the new needs: ...
+
+## Results
+
+- Time (only 2 training texts possible)
+- Realistic results (distribution of tags we get...)
+- Stopping criterion of loop (10% gain)
+- ...
