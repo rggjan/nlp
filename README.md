@@ -172,4 +172,10 @@ possibility of the whole training text. If this probability increases by
 less than 10 per cent in one iteration, we stop.
 
 ## Results
-- Due to the long run times, only 2 training texts are feasible
+Due to the long run times, only about 2 training texts are feasible, what is
+what we tested our algorithm with.
+
+However, the results for a given training set look quite reasonable. The ten
+unknown tags are reasonably distributed over all the sentences, and similar word
+types seem to be tagged with similar tags (like "I", "he" and "Scotty" often with tag "s2",
+for example).
